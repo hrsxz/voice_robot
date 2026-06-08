@@ -1,0 +1,38 @@
+{
+    "pylint.enabled": true,
+    "editor.rulers": [
+        88,
+        100
+    ],
+    "editor.acceptSuggestionOnEnter": "off",
+    "python.defaultInterpreterPath": ".venv/Scripts/python.exe",
+    // Activate venv when start terminal
+    "terminal.integrated.env.windows": {
+        "PYTHONPATH": "${workspaceFolder};"
+    },
+    "terminal.integrated.defaultProfile.windows": "Command Prompt",
+    "terminal.integrated.profiles.windows": {
+        "Command Prompt": {
+            "path": "cmd.exe",
+            "args": [
+                "/k",
+                ".venv\\Scripts\\activate"
+            ]
+        }
+    },
+    // Set base path for python in linux
+    "terminal.integrated.env.linux": {
+        "PYTHONPATH": "${workspaceFolder}"
+    },
+    // Jupyter Notebook
+    "jupyter.notebookFileRoot": "${workspaceFolder};",
+    "notebook.output.textLineLimit": 15,
+    "jupyter.outputSizeLimit": 10,
+    "notebook.output.scrolling": false,
+    // Activate formatting on save
+    "python.formatting.provider": "black",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit"
+    },
+}

@@ -1,14 +1,15 @@
 from pybricks.hubs import PrimeHub
-from pybricks.pupdevices import Motor, ColorSensor, UltrasonicSensor, ForceSensor
 from pybricks.parameters import Button, Color, Direction, Port, Side, Stop
+from pybricks.pupdevices import (ColorSensor, ForceSensor, Motor,
+                                 UltrasonicSensor)
 from pybricks.robotics import DriveBase
-from pybricks.tools import wait, StopWatch
+from pybricks.tools import StopWatch, wait
 
 hub = PrimeHub()
 
 
-from usys import stdin, stdout
 from uselect import poll
+from usys import stdin, stdout
 
 left_motor = Motor(Port.E)
 right_motor = Motor(Port.A)

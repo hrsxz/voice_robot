@@ -1,10 +1,10 @@
 [project]
-name = "micropython"
+name = "voice-robot"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "asyncio>=4.0.0",
-    "bleak>=0.22.3",
+    "bleak>=3.0.2",
 ]
