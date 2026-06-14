@@ -7,4 +7,8 @@ requires-python = ">=3.11"
 dependencies = [
     "asyncio>=4.0.0",
     "bleak>=3.0.2",
+    "flake8-pyproject>=1.2.4",
 ]
+
+[tool.flake8]
+max-line-length = 100
