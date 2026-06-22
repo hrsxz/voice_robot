@@ -8,6 +8,8 @@ dependencies = [
     "asyncio>=4.0.0",
     "bleak>=3.0.2",
     "flake8-pyproject>=1.2.4",
+    "ollama-client>=0.1.0",
+    "openai>=2.43.0",
 ]
 
 [tool.flake8]

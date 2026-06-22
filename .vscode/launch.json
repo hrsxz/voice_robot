@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: Run controller (simulate, dry-run)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/pc/llm/controller.py",
+      "console": "integratedTerminal",
+      "args": ["--simulate", "--dry-run", "--prompt", "向前走 20 厘米"],
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}

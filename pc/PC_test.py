@@ -44,7 +44,6 @@ async def main():
         while True:
             cmd = input("> ")
 
-
             if cmd == "exit":
                 break
 
