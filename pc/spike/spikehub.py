@@ -1,6 +1,5 @@
 import argparse
 import asyncio
-import time
 
 from bleak import BleakClient, BleakScanner
 
@@ -11,6 +10,7 @@ class SpikeHub:
         self.HUB_NAME = hub_name
         self.client = None
         self.simulate = bool(simulate)
+        self.loop = None
 
         # Hub 发来 rdy 时 set()
         self.ready_event = asyncio.Event()
@@ -27,6 +27,7 @@ class SpikeHub:
             return
 
         print("Searching hub...")
+        self.loop = asyncio.get_running_loop()
 
         device = await BleakScanner.find_device_by_name(self.HUB_NAME)
         if device is None:
@@ -66,19 +67,22 @@ class SpikeHub:
 
             payload = data[1:]
 
-            if payload == b"rdy":
-                # 在 notify 回调线程中安全地 set
+            if b"rdy" in payload:
+                # Hub 可能把 OK 和下一轮 rdy 合并在同一帧里发回来，例如 OKrdy。
                 try:
-                    loop = asyncio.get_event_loop()
-                    loop.call_soon_threadsafe(self.ready_event.set)
+                    if self.loop is not None:
+                        self.loop.call_soon_threadsafe(self.ready_event.set)
+                    else:
+                        self.ready_event.set()
                 except Exception:
-                    # fallback
                     try:
                         self.ready_event.set()
                     except Exception:
                         pass
 
-            else:
+                payload = payload.replace(b"rdy", b"")
+
+            if payload:
                 try:
                     print("Hub:", payload.decode())
                 except Exception:
@@ -86,12 +90,12 @@ class SpikeHub:
 
     async def send(self, cmd: str):
         """
-        发送字符串命令
+        发送字符串命令，并等待 Hub 再次发出 rdy。
         """
 
         if self.simulate:
             # 简单模拟：打印并短暂延时模拟 BLE 交互
-            print(f"[SIM] -> {cmd}")
+            print(f"[SIMULATION ANSWER] <- {cmd} Done.")
             # 模拟 hub 需要时间处理并返回 ready
             await asyncio.sleep(0.05)
             return
@@ -102,38 +106,18 @@ class SpikeHub:
         # 为下一次发送做准备
         self.ready_event.clear()
 
-        await self.client.write_gatt_char(
+        client = self.client
+        if client is None:
+            raise RuntimeError("Spike Hub is not connected")
+
+        await client.write_gatt_char(
             self.UUID,
             b"\x06" + (cmd + "\n").encode(),
             response=True
         )
 
-    async def forward(self):
-        await self.send("forward")
-
-    async def backward(self):
-        await self.send("backward")
-
-    async def stop(self):
-        await self.send("stop")
-
-    async def turn_left(self):
-        await self.send("left")
-
-    async def turn_right(self):
-        await self.send("right")
-
-    async def move_cm(self, distance_cm: int):
-        """
-        以后实现
-        """
-        raise NotImplementedError
-
-    async def turn_deg(self, angle_deg: int):
-        """
-        以后实现
-        """
-        raise NotImplementedError
+        # 命令执行完成后，Hub 会在下一轮循环重新发出 rdy。
+        await self.ready_event.wait()
 
 
 # ----- CLI / demo runner -----
@@ -156,16 +140,6 @@ async def interactive_mode(spike: SpikeHub):
         print("已断开连接。")
 
 
-async def demo_sequence(spike: SpikeHub, commands, delay: float = 3):
-    await spike.connect()
-    for c in commands:
-        print("发送:", c)
-        await spike.send(c)
-        await asyncio.sleep(delay)
-    await spike.disconnect()
-    print("示例序列完成。")
-
-
 def main():
     parser = argparse.ArgumentParser(
         description="SpikeHub PC-side runner (interactive/demo)")
@@ -175,11 +149,7 @@ def main():
 
     spike = SpikeHub(simulate=args.simulate)
 
-    if args.demo:
-        cmds = ["forward", "stop", "left", "right", "backward", "stop"]
-        asyncio.run(demo_sequence(spike, cmds))
-    else:
-        asyncio.run(interactive_mode(spike))
+    asyncio.run(interactive_mode(spike))
 
 
 if __name__ == "__main__":

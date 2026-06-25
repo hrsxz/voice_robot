@@ -7,10 +7,34 @@ requires-python = ">=3.11"
 dependencies = [
     "asyncio>=4.0.0",
     "bleak>=3.0.2",
-    "flake8-pyproject>=1.2.4",
+    "dotenv>=0.9.9",
+    "edge-tts>=7.2.8",
     "ollama-client>=0.1.0",
     "openai>=2.43.0",
+    "pygame>=2.6.1",
+    "pynput>=1.8.2",
+    "pyttsx3>=2.99",
+    "sounddevice>=0.5.5",
+    "soundfile>=0.14.0",
+    "truststore>=0.10.4",
+]
+
+[dependency-groups]
+dev = [
+    "pylint>=4.0.6",
+    "flake8-pyproject>=1.2.4",
 ]
 
 [tool.flake8]
 max-line-length = 100
+
+[tool.pylint."messages control"]
+disable = [
+    "C0114", # missing-module-docstring
+    "C0115", # missing-class-docstring
+    "C0116", # missing-function-docstring
+    "W1203", # logging-fstring-interpolation
+    "W1202", # logging-not-lazy
+    "E0611", # no-name-in-module
+    "W0718", # broad-exception-caught
+]
