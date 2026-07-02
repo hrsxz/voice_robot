@@ -1,8 +1,10 @@
+# coding: utf-8
+
 import asyncio
 
 from pc.agent import robot_agent
 from pc.llm import audio_utils, intent_mapper, intent_parser, llm_client
-from pc.spike.spikehub import SpikeHub
+from pc.spike_communication.spikehub import SpikeHub
 from pc.utils import utils
 
 
@@ -21,7 +23,7 @@ class VoiceController:
 
         if mode in ("mic", "microphone"):
             wav_path = await self.audio_client.record_push_to_talk()
-            # 同时尝试本地 whisper 和 OpenAI Whisper，取结果较好的一个
+             # 同时尝试本地 whisper 和 OpenAI Whisper，取结果较好的一个
             out = {"whisper": None, "openai": None, "errors": {}}
             try:
                 out["whisper"] = await self.audio_client.transcribe_whisper(wav_path)
@@ -40,74 +42,79 @@ class VoiceController:
 
         raise ValueError('unknown mode: ' + mode)
 
-    async def run_once(
+    async def run(
         self,
         mode: str,
         llm_model: str | None,
+        run_once: bool = True,
     ) -> None:
-        # step 0： connect to SpikeHub
+        # step 0: connect to SpikeHub
         await self.robot_agent.connect()
-
         try:
-            # step 1： parse input text from mic or cli
-            input_text = await self.get_input_text(mode)
-            # input text: 前走30cm 左转60度
-            print('input text:', input_text)
+            while True:
+                # step 1: parse input text from mic or cli
+                input_text = await self.get_input_text(mode)
+                # input text: 鍓嶈蛋30cm 宸﹁浆60搴�
+                print('input text:', input_text)
 
-            # step 2： call LLM to generate intent JSON
-            llm_out = await self.llm_client.generate(input_text, model=llm_model)
-            # LLM output: {
-            #   "steps":[
-            #         {"action":"forward","params":{"distance_cm":30,"angle_deg":null}},
-            #         {"action":"turn_left","params":{"distance_cm":null,"angle_deg":60}}
-            #     ]
-            # }
-            print('LLM output:', llm_out)
+                # step 2: call LLM to generate intent JSON
+                llm_out = await self.llm_client.generate(input_text, model=llm_model)
+                # LLM output: {
+                #   "steps":[
+                #         {"action":"forward","params":{"distance_cm":30,"angle_deg":null}},
+                #         {"action":"turn_left","params":{"distance_cm":null,"angle_deg":60}}
+                #     ]
+                # }
+                print('LLM output:', llm_out)
 
-            # step 3： parse intent from LLM output
-            intent = intent_parser.parse_intent(llm_out)
-            # parsed intent: {
-            #   'steps': [
-            #       {'action': 'forward', 'params': {'distance_cm': 30, 'angle_deg': None}},
-            #       {'action': 'left', 'params': {'distance_cm': None, 'angle_deg': 60}}
-            #   ]
-            # }
-            print('parsed intent:', intent)
+                # step 3: parse intent from LLM output
+                intent = intent_parser.parse_intent(llm_out)
+                # parsed intent: {
+                #   'steps': [
+                #       {'action': 'forward', 'params': {'distance_cm': 30, 'angle_deg': None}},
+                #       {'action': 'left', 'params': {'distance_cm': None, 'angle_deg': 60}}
+                #   ]
+                # }
+                print('parsed intent:', intent)
 
-            # step 4： convert intent to sequence and execute
-            seq = intent_mapper.intent_to_sequence(intent)
-            # sequence: {
-            #   'sequence': [
-            #       {'cmd': 'forward 30'},
-            #       {'cmd': 'left 60'}
-            #   ]
-            # }
-            print('sequence:', seq)
+                # step 4: convert intent to sequence and execute
+                seq = intent_mapper.intent_to_sequence(intent)
+                # sequence: {
+                #   'sequence': [
+                #       {'cmd': 'forward 30'},
+                #       {'cmd': 'left 60'}
+                #   ]
+                # }
+                print('sequence:', seq)
 
-            # step 5： execute the sequence of commands on the SpikeHub
-            exec_result = await self.robot_agent.execute_sequence(seq)
-            # Executed command: forward 30
-            # Executed command: left 60
-            print("execute result:", exec_result)
-            # execute result: {
-            #   'status': 'ok',
-            #   'executed': ['forward 30', 'left 60'],
-            #   'skipped': [],
-            #   'errors': []
-            # }
+                # step 5: execute the sequence of commands on the SpikeHub
+                exec_result = await self.robot_agent.execute_sequence(seq)
+                # Executed command: forward 30
+                # Executed command: left 60
+                print("execute result:", exec_result)
+                # execute result: {
+                #   'status': 'ok',
+                #   'executed': ['forward 30', 'left 60'],
+                #   'skipped': [],
+                #   'errors': []
+                # }
+
+                if run_once:
+                    break
         finally:
             await self.robot_agent.disconnect()
 
 
 if __name__ == '__main__':
     # Initialize SpikeHub in simulation mode for testing
-    voice_controller = VoiceController(spike_simulation=False)
+    voice_controller = VoiceController(spike_simulation=True)
 
     try:
         asyncio.run(
-            voice_controller.run_once(
-                mode='cli',  # mic cli
+            voice_controller.run(
+                mode='mic',  # mic cli
                 llm_model="gpt-5.4-mini",  # # gpt-5.4-mini # gpt-5.4 gpt-5.5
+                run_once=False,  # True for single command, False for continuous listening
             )
         )
     except Exception as exc:
