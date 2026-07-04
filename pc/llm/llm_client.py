@@ -1,6 +1,7 @@
 import asyncio
 import os
 import ssl
+from pathlib import Path
 from typing import Any
 
 import httpx
@@ -42,54 +43,59 @@ class LLMClient:
         self._openai_http_client: Any = None
         self._openai_client: Any = None
 
+        self.skills_context = self._load_skills_context(constants.project_root_path / "skills")
+
+    def _load_skills_context(self, skills_dir: Path) -> str:
+        if not skills_dir.exists() or not skills_dir.is_dir():
+            return ""
+
+        blocks: list[str] = []
+        for p in sorted(skills_dir.glob("*.skill.md")):
+            try:
+                text = p.read_text(encoding="utf-8")
+            except Exception:
+                continue
+
+            fm = self._extract_frontmatter(text)
+            if fm:
+                blocks.append(f"[{p.name}]\n{fm}")
+
+        return "\n\n".join(blocks)
+
+    @staticmethod
+    def _extract_frontmatter(md_text: str) -> str:
+        s = (md_text or "").lstrip()
+        if not s.startswith("---"):
+            return ""
+        parts = s.split("---", 2)
+        if len(parts) < 3:
+            return ""
+        return parts[1].strip()
+
     def build_intent_prompt(self, user_text: str) -> str:
         """
-        把自然语言指令转换为严格 JSON。
-        只允许输出一个 JSON 对象，不要 markdown，不要解释。
-        支持多步骤动作。
+        基于 skills frontmatter 组装意图提示词。
+        说明:
+        - 全局规则来自 skills/base.skill.md
+        - 动作与参数约束来自各技能文件
         """
-        schema = """
-            你是机器人动作解析器。把用户输入转换为 JSON。
+        if self.skills_context:
+            return (
+                "你是机器人动作解析器。请严格遵循以下技能定义与约束，"
+                "把用户输入转换为合法 JSON。\n"
+                "只允许输出一个 JSON 对象，不要 markdown，不要解释。\n\n"
+                "可用技能定义（来自 skills 目录 frontmatter）:\n"
+                f"{self.skills_context}\n\n"
+                f"用户输入: {user_text}"
+            )
 
-            只允许输出如下结构（且必须是合法 JSON）：
-            {
-                "steps": [
-                {
-                    "action": "forward|backward|left|right|stop",
-                    "params": {
-                    "distance_cm": number|null,
-                    "angle_deg": number|null
-                    }
-                }
-                ]
-            }
-
-            规则：
-            1) 只输出 JSON，不要代码块，不要解释文本。
-            2) steps 必须是数组，按执行顺序排列。
-            3) action 只能是: forward, backward, turn_left, turn_right, stop, gripper_up,
-            gripper_down, gripper_pos, straightforward, straightbackward, face_to.
-            4) 无法识别时返回: {"steps": []}
-            5) distance 统一为 cm；angle 统一为 deg。
-            6) forward/backward 仅使用 distance_cm，angle_deg 设为 null。
-            7) turn_left/turn_right 仅使用 angle_deg，distance_cm 设为 null。
-            8) face_to 仅使用 angle_deg，distance_cm 设为 null。
-            9) stop 时两个参数都为 null。
-            10) gripper_up/gripper_down 两个参数都为 null。
-            11) gripper_pos 仅使用 angle_deg，distance_cm 设为 null。
-            12) straightforward/straightbackward 仅使用 distance_cm，angle_deg 设为 null。
-            13) 若用户说“先A再B”，必须输出两个 step，不要合并为一个 step。
-
-            示例：
-            用户输入: 向前走30cm，之后左转90度, gripper_down
-            输出:
-            {"steps":[
-                {"action":"forward","params":{"distance_cm":30,"angle_deg":null}},
-                {"action":"turn_left","params":{"distance_cm":null,"angle_deg":90}},
-                {"action":"gripper_down","params":{"distance_cm":null,"angle_deg":null}}
-            ]}
-        """
-        return f"{schema}\n用户输入: {user_text}"
+        # 兜底: 没有 skills 时仍强制 JSON-only 输出。
+        return (
+            "你是机器人动作解析器。"
+            "只输出合法 JSON，格式为 {'steps':[{'action':'...','args':{...}}]}，"
+            "不要 markdown，不要解释。\n"
+            f"用户输入: {user_text}"
+        )
 
     async def generate(
         self,
@@ -134,6 +140,7 @@ class LLMClient:
 
     async def _call_openai(self, prompt: str, model: str) -> str:
         if self._openai_http_client is None:
+            verify: Any
             try:
                 verify = truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
             except Exception:
@@ -148,7 +155,7 @@ class LLMClient:
             )
         try:
             resp = await self._openai_client.chat.completions.create(
-                model="gpt-5.4-mini", # gpt-5.4-mini # gpt-5.4 gpt-5.5
+                model=model,  # gpt-5.4-mini # gpt-5.4 gpt-5.5
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.0,
             )
@@ -161,7 +168,7 @@ class LLMClient:
             raise RuntimeError(f"OpenAI connection error: {e}") from e
         except APIStatusError as e:
             raise RuntimeError(f"OpenAI API status error ({e.status_code}): {e}") from e
-    
+
     async def aclose(self) -> None:
         if self._openai_http_client is not None:
             await self._openai_http_client.aclose()

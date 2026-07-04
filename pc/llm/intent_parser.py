@@ -7,11 +7,11 @@ def parse_intent(llm_text: str) -> dict:
         obj = json.loads(_extract_json_text(llm_text))
         if isinstance(obj, dict):
             # Generated JSON format example:
-            # {"steps":[
-            #     {"action":"forward","params":{"distance_cm":30,"angle_deg":null}},
-            #     {"action":"turn_left","params":{"distance_cm":null,"angle_deg":90}},
-            #     {"action":"gripper_down","params":{"distance_cm":null,"angle_deg":null}}
-            # ]}
+            # '{"steps":[
+            #   {"action":"forward","args":{"distance_cm":30}},
+            #   {"action":"left","args":{"angle_deg":60}},
+            #   {"action":"gripper_up","args":{}}
+            # ]}'
             steps = obj.get("steps")
             if isinstance(steps, list):
                 normalized_steps: list[dict] = []
@@ -20,11 +20,10 @@ def parse_intent(llm_text: str) -> dict:
                     if normalized:
                         normalized_steps.append(normalized)
                 return {"steps": normalized_steps}
-            # normalized_steps: {
-            #   'steps': [
-            #       {'action': 'forward', 'params': {'distance_cm': 30, 'angle_deg': None}},
-            #       {'action': 'left', 'params': {'distance_cm': None, 'angle_deg': 60}}
-            #   ]
+            # normalized_steps: {[
+            #   {'action': 'forward', 'args': {'distance_cm': 30}}
+            #   {'action': 'left', 'args': {'angle_deg': 60}}
+            #   {'action': 'gripper_up', 'args': {}}
             # }
     except Exception:
         pass
@@ -43,31 +42,36 @@ def _normalize_step(obj: dict) -> dict | None:
     if not action:
         return None
 
-    params = obj.get("params") or {}
-    if not isinstance(params, dict):
-        params = {}
+    raw_args = obj.get("args")
+    if isinstance(raw_args, dict):
+        payload = raw_args
+    else:
+        payload = {}
 
-    params_out: dict[str, int | None] = {
-        "distance_cm": _to_int_or_none(params.get("distance_cm")),
-        "angle_deg": _to_int_or_none(params.get("angle_deg")),
-    }
-
-    # Action parameter constraints
     if action in ("forward", "backward", "straightforward", "straightbackward"):
-        params_out["angle_deg"] = None
-    elif action in ("left", "right"):
-        params_out["distance_cm"] = None
-    elif action in ("gripper_up", "gripper_down"):
-        params_out["distance_cm"] = None
-        params_out["angle_deg"] = None
-    elif action == "gripper_pos":
-        params_out["distance_cm"] = None
-        params_out["angle_deg"] = None
-    elif action == "stop":
-        params_out["distance_cm"] = None
-        params_out["angle_deg"] = None
+        distance = _to_int_or_none(payload.get("distance_cm"))
+        return {"action": action, "args": {"distance_cm": distance}}
 
-    return {"action": action, "params": params_out}
+    if action in ("left", "right", "face_to", "gripper_pos"):
+        angle = _to_int_or_none(payload.get("angle_deg"))
+        return {"action": action, "args": {"angle_deg": angle}}
+
+    if action in ("gripper_up", "gripper_down", "stop"):
+        return {"action": action, "args": {}}
+
+    if action == "camera":
+        mode = _to_str_or_none(payload.get("mode"))
+        if mode not in ("photo", "video"):
+            mode = "photo"
+        return {"action": action, "args": {"mode": mode}}
+
+    if action == "sensor":
+        name = _to_str_or_none(payload.get("name"))
+        if name not in ("distance", "color", "gyro"):
+            name = "distance"
+        return {"action": action, "args": {"name": name}}
+
+    return None
 
 
 def _to_int_or_none(value: object) -> int | None:
@@ -87,6 +91,15 @@ def _to_int_or_none(value: object) -> int | None:
     try:
         return int(str(value))
     except (TypeError, ValueError):
+        return None
+
+
+def _to_str_or_none(value: object) -> str | None:
+    if value in (None, ""):
+        return None
+    try:
+        return str(value).strip().lower() or None
+    except Exception:
         return None
 
 
@@ -123,13 +136,13 @@ def _fallback_steps_from_text(text: str) -> list[dict]:
 
         p = _extract_params(clause)
         if action in ("forward", "backward"):
-            step = {"action": action, "params": {"distance_cm": p.get("distance_cm")}}
+            step = {"action": action, "args": {"distance_cm": p.get("distance_cm")}}
         elif action in ("left", "right"):
-            step = {"action": action, "params": {"angle_deg": p.get("angle_deg")}}
+            step = {"action": action, "args": {"angle_deg": p.get("angle_deg")}}
         elif action in ("gripper_up", "gripper_down", "gripper_pos"):
-            step = {"action": action, "params": {}}
+            step = {"action": action, "args": {}}
         else:
-            step = {"action": "stop", "params": {}}
+            step = {"action": "stop", "args": {}}
 
         steps.append(step)
 
@@ -162,6 +175,10 @@ def _normalize_action(action: str) -> str | None:
         return "gripper_pos"
     if value in ("gripper_up", "gripper_down", "gripper_pos"):
         return value
+    if value in ("camera", "photo", "take_photo", "take picture", "拍照", "照相"):
+        return "camera"
+    if value in ("sensor", "read_sensor", "读取传感器"):
+        return "sensor"
     return None
 
 

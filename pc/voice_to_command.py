@@ -23,7 +23,7 @@ class VoiceController:
 
         if mode in ("mic", "microphone"):
             wav_path = await self.audio_client.record_push_to_talk()
-             # 同时尝试本地 whisper 和 OpenAI Whisper，取结果较好的一个
+            # 同时尝试本地 whisper 和 OpenAI Whisper，取结果较好的一个
             out = {"whisper": None, "openai": None, "errors": {}}
             try:
                 out["whisper"] = await self.audio_client.transcribe_whisper(wav_path)
@@ -54,25 +54,24 @@ class VoiceController:
             while True:
                 # step 1: parse input text from mic or cli
                 input_text = await self.get_input_text(mode)
-                # input text: 鍓嶈蛋30cm 宸﹁浆60搴�
+                # input text: 前进30cm 左转60度，夹子60度
                 print('input text:', input_text)
 
                 # step 2: call LLM to generate intent JSON
                 llm_out = await self.llm_client.generate(input_text, model=llm_model)
                 # LLM output: {
                 #   "steps":[
-                #         {"action":"forward","params":{"distance_cm":30,"angle_deg":null}},
-                #         {"action":"turn_left","params":{"distance_cm":null,"angle_deg":60}}
-                #     ]
-                # }
+                #       {"action":"forward","args":{"distance_cm":30}},
+                #       {"action":"left","args":{"angle_deg":60}}
+                # ]}
                 print('LLM output:', llm_out)
 
                 # step 3: parse intent from LLM output
                 intent = intent_parser.parse_intent(llm_out)
                 # parsed intent: {
                 #   'steps': [
-                #       {'action': 'forward', 'params': {'distance_cm': 30, 'angle_deg': None}},
-                #       {'action': 'left', 'params': {'distance_cm': None, 'angle_deg': 60}}
+                #       {'action': 'forward',"args":{"distance_cm":30}},
+                #       {'action': 'left',"args":{"angle_deg":60}}
                 #   ]
                 # }
                 print('parsed intent:', intent)
@@ -112,7 +111,7 @@ if __name__ == '__main__':
     try:
         asyncio.run(
             voice_controller.run(
-                mode='mic',  # mic cli
+                mode='cli',  # mic cli
                 llm_model="gpt-5.4-mini",  # # gpt-5.4-mini # gpt-5.4 gpt-5.5
                 run_once=False,  # True for single command, False for continuous listening
             )

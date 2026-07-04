@@ -1,25 +1,72 @@
 ---
 id: move
 name: Move
-description: "让机器人按厘米数移动"
+description: "移动与底盘/夹爪控制动作"
 triggers:
-  - move
   - 前进
-  - 向前
+  - 后退
+  - 左转
+  - 右转
+  - 停止
+  - 夹爪
 permissions: low
 input_schema:
   type: object
   properties:
-    distance_cm:
-      type: number
-      minimum: 0
-      maximum: 5
-    speed:
-      type: number
-      minimum: 0
-      maximum: 100
+    action:
+      type: string
+      enum:
+        - stop
+        - forward
+        - backward
+        - straightforward
+        - straightbackward
+        - left
+        - right
+        - face_to
+        - gripper_up
+        - gripper_down
+        - gripper_pos
+    args:
+      type: object
+      properties:
+        distance_cm:
+          type: integer
+          minimum: 0
+          maximum: 10000
+        angle_deg:
+          type: integer
+          minimum: 0
+          maximum: 360
+      additionalProperties: false
   required:
-    - distance_cm
+    - action
+    - args
+  allOf:
+    - if:
+        properties:
+          action:
+            enum: [forward, backward, straightforward, straightbackward]
+      then:
+        properties:
+          args:
+            required: [distance_cm]
+    - if:
+        properties:
+          action:
+            enum: [left, right, face_to, gripper_pos]
+      then:
+        properties:
+          args:
+            required: [angle_deg]
+    - if:
+        properties:
+          action:
+            enum: [stop, gripper_up, gripper_down]
+      then:
+        properties:
+          args:
+            maxProperties: 0
 output_schema:
   type: object
   properties:
@@ -27,57 +74,82 @@ output_schema:
       type: string
     detail:
       type: string
-runtime: tools.move_tools:execute
+runtime: pc.tools.move_tools:execute
 examples:
-  - nl: "向前走 1 米"
+  - nl: "向前走 30 厘米"
     command:
-      action: move
-      params:
-        distance_cm: 1
-        speed: 50
+      action: forward
+      args:
+        distance_cm: 30
+    output_json: |
+      {
+        "steps": [
+          { "action": "forward", "args": { "distance_cm": 30 } }
+        ]
+      }
+  - nl: "左转 90 度"
+    command:
+      action: left
+      args:
+        angle_deg: 90
+    output_json: |
+      {
+        "steps": [
+          { "action": "left", "args": { "angle_deg": 90 } }
+        ]
+      }
+  - nl: "把夹爪抬起来"
+    command:
+      action: gripper_up
+      args: {}
+    output_json: |
+      {
+        "steps": [
+          { "action": "gripper_up", "args": {} }
+        ]
+      }
 version: "1.0"
 ---
 
 # 使用说明
 
-目的: 让机器人移动指定的米数，适用于短距离位置调整和避障后微调。
+目的: 统一描述移动类动作的生成格式，并与当前程序链路对齐。
+
+说明: LLM/intent 层使用 `action + args`，运行时 `move_tools.execute` 使用 `action + value`。
+在 RobotAgent 分发前会做参数映射：
+
+- `args.distance_cm` -> `value`（前进/后退/直行相关动作）
+- `args.angle_deg` -> `value`（转向/角度相关动作）
+- 无参动作（stop/gripper_up/gripper_down）-> `value=None`
 
 NL 示例:
 
-- "向前走 1 厘米" → {"action":"move","params":{"distance_cm":1}}
- - "后退 0.5 厘米，慢速" → {"action":"move","params":{"distance_cm":0.5,"speed":20,"direction":"backward"}}
+- "向前走 30 厘米" -> {"action":"forward","args":{"distance_cm":30}}
+- "后退 20 厘米" -> {"action":"backward","args":{"distance_cm":20}}
+- "右转 45 度" -> {"action":"right","args":{"angle_deg":45}}
+- "朝 120 度方向" -> {"action":"face_to","args":{"angle_deg":120}}
+- "夹爪到 60 度" -> {"action":"gripper_pos","args":{"angle_deg":60}}
+- "停止" -> {"action":"stop","args":{}}
 
 直接调用示例:
 
 ```python
-from tools import move_tools  # 或根据项目结构使用 from pc.tools import move_tools
-# 同步调用示例（工具实现可能是 sync 或 async）：
-res = move_tools.execute({"distance_cm": 1, "speed": "normal"})
-# 返回示例: {"status": "ok", "detail": "moved 1.0m"}
-# 错误示例: {"status": "error", "detail": "obstacle detected"}
+from pc.tools import move_tools
+
+# move_tools.execute 是 async，运行时要求传 hub/action/value
+res = await move_tools.execute({"hub": hub, "action": "forward", "value": 30})
+# 成功示例: {"status": "ok", "detail": "forward 30"}
+# 失败示例: {"status": "error", "detail": "forward requires value"}
 ```
 
 输入说明:
 
-- `distance_cm` (number): 要移动的距离，单位为米，范围由 schema 限制（0–5m）。
-- `speed` (number): 可选，范围 0-100，默认 50。
-- 可选 `direction` 字段指定 `forward|backward|left|right`，默认向前。
-- 可选 `dry_run` 布尔值：`true` 表示仅模拟执行并返回预期结果。
+- `action`: 见 schema 枚举。
+- `args.distance_cm`: 仅用于 `forward/backward/straightforward/straightbackward`。
+- `args.angle_deg`: 仅用于 `left/right/face_to/gripper_pos`。
+- `stop/gripper_up/gripper_down` 不需要参数，使用空对象 `args: {}`。
 
 输出说明:
 
-- 成功: `{ "status": "ok", "detail": "moved X m" }`。
+- 成功: `{ "status": "ok", "detail": "<sent cmd>" }`。
 - 失败: `{ "status": "error", "detail": "原因描述" }`。
-
-权限与确认:
-
-- 标记为 `permissions: low`，但当 `distance_cm` 超过 1.0m 或存在环境未知时，建议 agent 层进行二次确认。
-
-错误与重试策略:
-
-- 常见错误: 障碍物检测、执行器忙、超时。
-- 建议: 对 `obstacle detected` 返回进行 1 次降速重试，或请求用户确认后重试。
-
-测试:
-
-- 若无硬件，可实现一个模拟 `tools.move_tools.execute`，例如返回 `{ "status": "ok", "detail": "<simulated>" }`，用于单元测试与 CI。
