@@ -2,6 +2,7 @@
 id: camera
 name: Camera
 description: "拍照或录制视频"
+version: "1.0"
 triggers:
   - camera
   - 拍照
@@ -36,6 +37,14 @@ output_schema:
       type: string
     path:
       type: string
+action_rules:
+  camera:
+    route: camera
+    value_type: str
+    arg_key: mode
+    allowed:
+      - photo
+      - video
 runtime: pc.tools.camera_tools:execute
 examples:
   - nl: "拍一张照片"
@@ -48,7 +57,6 @@ examples:
       action: camera
       args:
         mode: video
-version: "1.0"
 ---
 
 # 使用说明

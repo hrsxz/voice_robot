@@ -2,6 +2,7 @@
 id: sensor
 name: Sensor
 description: "读取传感器数据"
+version: "1.0"
 triggers:
   - sensor
   - 传感器
@@ -35,6 +36,15 @@ output_schema:
     status:
       type: string
     value: {}
+action_rules:
+  sensor:
+    route: sensor
+    value_type: str
+    arg_key: name
+    allowed:
+      - distance
+      - color
+      - gyro
 runtime: pc.tools.sensor_tool:execute
 examples:
   - nl: "读取距离传感器"
@@ -47,7 +57,6 @@ examples:
       action: sensor
       args:
         name: color
-version: "1.0"
 ---
 
 # 使用说明

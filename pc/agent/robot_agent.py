@@ -1,6 +1,7 @@
 from typing import Any
 
 from pc.tools import camera_tools, move_tools, sensor_tool
+from skills import load_skill_registry
 
 
 class RobotAgent:
@@ -9,25 +10,9 @@ class RobotAgent:
     输入 -> LLM -> intent_parser -> intent_mapper ->
     RobotAgent.execute_sequence    -> hub
     """
-    ACTION_RULES = {
-        "stop": {"route": "move", "value_type": "none"},
-        "forward": {"route": "move", "value_type": "int", "min": 0, "max": 10000},
-        "backward": {"route": "move", "value_type": "int", "min": 0, "max": 10000},
-        "straightforward": {"route": "move", "value_type": "int", "min": 0, "max": 10000},
-        "straightbackward": {"route": "move", "value_type": "int", "min": 0, "max": 10000},
-        "left": {"route": "move", "value_type": "int", "min": 0, "max": 10000},
-        "right": {"route": "move", "value_type": "int", "min": 0, "max": 10000},
-        "face_to": {"route": "move", "value_type": "int", "min": 0, "max": 360},
-        "gripper_up": {"route": "move", "value_type": "none"},
-        "gripper_down": {"route": "move", "value_type": "none"},
-        "gripper_pos": {"route": "move", "value_type": "int", "min": 0, "max": 360},
-        "camera": {"route": "camera", "value_type": "str", "allowed": {"photo", "video"}},
-        "sensor": {"route": "sensor", "value_type": "str",
-                   "allowed":{"distance", "color", "gyro"}},
-    }
-
     def __init__(self, hub: Any):
         self.hub = hub
+        self.action_rules = load_skill_registry().actions
 
     async def connect(self) -> None:
         if hasattr(self.hub, "connect"):
@@ -56,7 +41,7 @@ class RobotAgent:
         "errors": [{"index": i, "cmd": "...", "error": "..."}]
         }
         """
-        result = {
+        result: dict[str, Any] = {
             "status": "ok",
             "executed": [],
             "skipped": [],
@@ -82,7 +67,8 @@ class RobotAgent:
             # normalized_cmd = {'action': 'forward', 'value': 30}
             action = normalized_cmd["action"]
             value = normalized_cmd["value"]
-            route = self.ACTION_RULES[action]["route"]
+            rule = self.action_rules[action]
+            route = rule.route
 
             try:
                 exec_out = await self._dispatch(route=route, action=action, value=value)
@@ -143,11 +129,11 @@ class RobotAgent:
         action = parts[0].lower()
         raw_value = parts[1].strip() if len(parts) == 2 else None
 
-        if action not in self.ACTION_RULES:
+        if action not in self.action_rules:
             return False, {}, "unknown action"
 
-        rule = self.ACTION_RULES[action]
-        value_type = rule["value_type"]
+        rule = self.action_rules[action]
+        value_type = rule.value_type
 
         if value_type == "none":
             if raw_value is not None:
@@ -161,18 +147,18 @@ class RobotAgent:
             value = self._parse_int(raw_value)
             if value is None:
                 return False, {}, "value is not integer"
-            if "min" in rule and value < rule["min"]:
+            if rule.min_value is not None and value < rule.min_value:
                 return False, {}, "value below min"
-            if "max" in rule and value > rule["max"]:
+            if rule.max_value is not None and value > rule.max_value:
                 return False, {}, "value above max"
             return True, {"action": action, "value": value}, ""
 
         if value_type == "str":
-            value = raw_value.lower()
-            allowed = rule.get("allowed")
-            if allowed and value not in allowed:
-                return False, {}, f"value not allowed: {value}"
-            return True, {"action": action, "value": value}, ""
+            str_value = raw_value.lower()
+            allowed = rule.allowed
+            if allowed and str_value not in allowed:
+                return False, {}, f"value not allowed: {str_value}"
+            return True, {"action": action, "value": str_value}, ""
 
         return False, {}, "unknown value_type"
 

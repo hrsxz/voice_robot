@@ -2,6 +2,7 @@
 id: move
 name: Move
 description: "移动与底盘/夹爪控制动作"
+version: "1.0"
 triggers:
   - 前进
   - 后退
@@ -74,6 +75,64 @@ output_schema:
       type: string
     detail:
       type: string
+action_rules:
+  stop:
+    route: move
+    value_type: none
+  forward:
+    route: move
+    value_type: int
+    arg_key: distance_cm
+    min: 0
+    max: 10000
+  backward:
+    route: move
+    value_type: int
+    arg_key: distance_cm
+    min: 0
+    max: 10000
+  straightforward:
+    route: move
+    value_type: int
+    arg_key: distance_cm
+    min: 0
+    max: 10000
+  straightbackward:
+    route: move
+    value_type: int
+    arg_key: distance_cm
+    min: 0
+    max: 10000
+  left:
+    route: move
+    value_type: int
+    arg_key: angle_deg
+    min: 0
+    max: 360
+  right:
+    route: move
+    value_type: int
+    arg_key: angle_deg
+    min: 0
+    max: 360
+  face_to:
+    route: move
+    value_type: int
+    arg_key: angle_deg
+    min: 0
+    max: 360
+  gripper_up:
+    route: move
+    value_type: none
+  gripper_down:
+    route: move
+    value_type: none
+  gripper_pos:
+    route: move
+    value_type: int
+    arg_key: angle_deg
+    min: 0
+    max: 360
 runtime: pc.tools.move_tools:execute
 examples:
   - nl: "向前走 30 厘米"
@@ -108,7 +167,6 @@ examples:
           { "action": "gripper_up", "args": {} }
         ]
       }
-version: "1.0"
 ---
 
 # 使用说明

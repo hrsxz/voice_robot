@@ -2,6 +2,7 @@
 id: intent_base
 name: Intent Base
 description: "全局意图输出规范（适用于所有动作技能）"
+version: "1.0"
 permissions: low
 output_contract:
   type: object
@@ -54,7 +55,6 @@ examples:
           { "action": "sensor", "args": { "name": "distance" } }
         ]
       }
-version: "1.0"
 ---
 
 # 使用说明

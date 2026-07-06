@@ -2,25 +2,43 @@
 把结构化意图映射为命令序列。
 
 输入契约:
-- 读取 steps 列表。
-- 每个 step 至少包含 action。
-- 仅从 step.args 读取参数。
+- 输入应为 {"steps": [...]}。
+- steps 中每个 step 应为 {"action": str, "args": dict}。
+- 参数只从 step.args 读取；若 args 不是 dict，则按空参数处理。
+- 无效输入（不是 dict、缺少/错误的 steps）返回 {"sequence": []}。
 
-当前支持动作:
-- 移动: forward/backward/straightforward/straightbackward
-- 转向: left/right/face_to
-- 夹爪: gripper_up/gripper_down/gripper_pos
-- 工具: camera(mode=photo|video), sensor(name=distance|color|gyro)
+动作来源与支持范围:
+- 动作规则动态来自 skills 目录各 *.skill.md 的 action_rules（经 load_skill_registry 加载并缓存）。
+- 常见动作包括:
+  - 移动/转向/夹爪: stop, forward, backward, straightforward, straightbackward,
+    left, right, face_to, gripper_up, gripper_down, gripper_pos
+  - 工具: camera(mode=photo|video), sensor(name=distance|color|gyro)
+- 若 action 不在规则表中，保留原 action 作为命令输出。
+
+映射规则:
+- value_type == "none": 输出 "action"
+- value_type == "int": 读取 rule.arg_key 对应参数，可转为整数则输出 "action <int>"，否则仅输出 "action"
+- value_type == "str": 读取 rule.arg_key 对应参数，若不在 allowed 中则回退到 allowed 的第一个值；最终输出 "action <str>"；
+  若无法确定字符串参数则仅输出 "action"
 
 输出契约:
 {
-    "sequence": [
-        {"cmd": "forward 30"},
-        {"cmd": "camera photo"},
-        {"cmd": "sensor distance"}
-    ]
+  "sequence": [
+    {"cmd": "forward 30"},
+    {"cmd": "camera photo"},
+    {"cmd": "sensor distance"}
+  ]
 }
 """
+
+from functools import lru_cache
+
+from skills import ActionRule, load_skill_registry
+
+
+@lru_cache(maxsize=1)
+def _action_rules() -> dict[str, ActionRule]:
+    return load_skill_registry().actions
 
 
 def _step_to_cmd(step: dict) -> str | None:
@@ -32,50 +50,28 @@ def _step_to_cmd(step: dict) -> str | None:
     if not action:
         return None
 
-    if action == "stop":
-        return "stop"
+    rule = _action_rules().get(action)
+    if rule is None:
+        return action
 
-    if action in ("forward", "backward", "straightforward", "straightbackward"):
-        distance = params.get("distance_cm")
-        if distance in (None, ""):
-            return action
-        parsed_distance = _to_int_or_none(distance)
-        if parsed_distance is None:
-            return action
-        return f"{action} {parsed_distance}"
+    if rule.value_type == "none":
+        return action
 
-    if action in ("left", "right", "face_to"):
-        angle = params.get("angle_deg")
-        if angle in (None, ""):
+    if rule.value_type == "int":
+        value = params.get(rule.arg_key or "")
+        if value in (None, ""):
             return action
-        parsed_angle = _to_int_or_none(angle)
-        if parsed_angle is None:
+        parsed_value = _to_int_or_none(value)
+        if parsed_value is None:
             return action
-        return f"{action} {parsed_angle}"
+        return f"{action} {parsed_value}"
 
-    if action in ("gripper_up", "gripper_down", "gripper_pos"):
-        if action in ("gripper_up", "gripper_down"):
+    if rule.value_type == "str":
+        raw_value = params.get(rule.arg_key or "")
+        value = _normalize_str_value(raw_value, rule)
+        if value is None:
             return action
-        if action == "gripper_pos":
-            angle = params.get("angle_deg")
-            if angle in (None, ""):
-                return action
-            parsed_angle = _to_int_or_none(angle)
-            if parsed_angle is None:
-                return action
-            return f"{action} {parsed_angle}"
-
-    if action == "camera":
-        mode = str(params.get("mode") or "photo").lower()
-        if mode not in ("photo", "video"):
-            mode = "photo"
-        return f"camera {mode}"
-
-    if action == "sensor":
-        name = str(params.get("name") or "distance").lower()
-        if name not in ("distance", "color", "gyro"):
-            name = "distance"
-        return f"sensor {name}"
+        return f"{action} {value}"
 
     # 兜底：直接把 action 当命令
     return action
@@ -124,4 +120,15 @@ def _to_int_or_none(value: object) -> int | None:
             return int(float(value.strip()))
         except ValueError:
             return None
+    return None
+
+
+def _normalize_str_value(value: object, rule: ActionRule) -> str | None:
+    if value not in (None, ""):
+        normalized = str(value).lower()
+        if not rule.allowed or normalized in rule.allowed:
+            return normalized
+
+    if rule.allowed:
+        return str(rule.allowed[0]).lower()
     return None

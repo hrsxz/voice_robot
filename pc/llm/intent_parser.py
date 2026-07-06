@@ -139,8 +139,13 @@ def _fallback_steps_from_text(text: str) -> list[dict]:
             step = {"action": action, "args": {"distance_cm": p.get("distance_cm")}}
         elif action in ("left", "right"):
             step = {"action": action, "args": {"angle_deg": p.get("angle_deg")}}
-        elif action in ("gripper_up", "gripper_down", "gripper_pos"):
+        elif action in ("gripper_up", "gripper_down"):
             step = {"action": action, "args": {}}
+        elif action == "gripper_pos":
+            angle = p.get("angle_deg")
+            if angle is None:
+                angle = p.get("distance_cm")
+            step = {"action": action, "args": {"angle_deg": angle}}
         else:
             step = {"action": "stop", "args": {}}
 

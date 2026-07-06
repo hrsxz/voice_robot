@@ -1,4 +1,5 @@
 import asyncio
+import importlib
 import os
 import ssl
 from pathlib import Path
@@ -14,7 +15,7 @@ from pc import constants
 
 # 尝试复用仓库内的本地 ollama 客户端（若存在）
 try:
-    from llm import ollama_client as _ollama
+    _ollama: Any = importlib.import_module("pc.llm.ollama_client")
     _HAS_OLLAMA = True
 except Exception:
     _ollama = None
