@@ -1,5 +1,5 @@
 from pybricks.hubs import PrimeHub
-from pybricks.parameters import Port
+from pybricks.parameters import Port, Direction
 from pybricks.pupdevices import ColorSensor, Motor
 from pybricks.robotics import DriveBase
 from pybricks.tools import wait
@@ -8,18 +8,21 @@ from usys import stdin, stdout
 
 hub = PrimeHub()
 
-left_motor = Motor(Port.E)
-right_motor = Motor(Port.A)
-gripper_b = Motor(Port.B)
-gripper_f = Motor(Port.F)
+left_motor = Motor(Port.E, Direction.CLOCKWISE)
+right_motor = Motor(Port.A, Direction.COUNTERCLOCKWISE)
+gripper_left = Motor(Port.B)
+gripper_right = Motor(Port.F, Direction.CLOCKWISE)
 color_sensor = ColorSensor(Port.D)
+
 
 # drive base
 robot = DriveBase(left_motor, right_motor, wheel_diameter=62, axle_track=167)
 
 # 启动前应把两个夹爪手动放在 down 位置
-gripper_b.reset_angle(0)
-gripper_f.reset_angle(0)
+LEFT_DOWN = 0
+LEFT_UP = 90
+RIGHT_DOWN = 0
+RIGHT_UP = -90
 
 GRIPPER_SPEED = 200
 LINE_TARGET = 58
@@ -27,12 +30,23 @@ LINE_SPEED = 50
 LINE_KP = 3
 MAX_TURN_RATE = 60
 
+gripper_left.run_target(GRIPPER_SPEED, LEFT_DOWN, wait=True)
+gripper_right.run_target(GRIPPER_SPEED, RIGHT_DOWN, wait=True)
+
 keyboard = poll()
 keyboard.register(stdin)
 
 
+def clamp_angle(angle):
+    return max(-90, min(90, int(angle)))
+
+
+def clamp_user_pos_0_90(value):
+    return max(0, min(90, int(value)))
+
+
 def set_gripper(motor, angle):
-    angle = max(0, min(90, angle))
+    angle = clamp_angle(angle)
     motor.run_target(GRIPPER_SPEED, angle, wait=True)
 
 
@@ -62,7 +76,7 @@ while True:
         wait(10)
 
     raw = stdin.buffer.readline().strip()
-    print(raw)
+    # print(raw)
 
     parts = raw.split()
     action = parts[0] if parts else b""
@@ -73,14 +87,14 @@ while True:
 
     if action == b"forward":
         if value is None:
-            left_motor.dc(-50)
+            left_motor.dc(50)
             right_motor.dc(50)
         else:
             robot.straight(value * 10)  # 这里乘以10是因为前端单位是厘米，车的单位是毫米
 
     elif action == b"backward":
         if value is None:
-            left_motor.dc(50)
+            left_motor.dc(-50)
             right_motor.dc(-50)
         else:
             robot.straight(-value * 10)  # 这里乘以10是因为前端单位是厘米，车的单位是毫米
@@ -88,34 +102,42 @@ while True:
     elif action == b"left":
         if value is None:
             left_motor.dc(50)
-            right_motor.dc(50)
+            right_motor.dc(-50)
         else:
-            robot.turn(-value)
+            robot.turn(value)
 
     elif action == b"right":
         if value is None:
             left_motor.dc(-50)
-            right_motor.dc(-50)
+            right_motor.dc(50)
         else:
-            robot.turn(value)
+            robot.turn(-value)
 
     elif action == b"stop":
         left_motor.stop()
         right_motor.stop()
 
-    elif action == b"gripper_b_down":
-        set_gripper(gripper_b, 0)
-    elif action == b"gripper_b_up":
-        set_gripper(gripper_b, 90)
-    elif action == b"gripper_b_pos" and value is not None:
-        set_gripper(gripper_b, value)
 
-    elif action == b"gripper_f_down":
-        set_gripper(gripper_f, 0)
-    elif action == b"gripper_f_up":
-        set_gripper(gripper_f, 90)
-    elif action == b"gripper_f_pos" and value is not None:
-        set_gripper(gripper_f, value)
+    elif action == b"gripper_up":
+        set_gripper(gripper_left, LEFT_UP)
+        set_gripper(gripper_right, RIGHT_UP)
+    elif action == b"gripper_down":
+        set_gripper(gripper_left, LEFT_DOWN)
+        set_gripper(gripper_right, RIGHT_DOWN)
+
+    elif action in (b"gripper_left_up", b"gripper_left_up"):
+        set_gripper(gripper_left, LEFT_UP)
+    elif action in (b"gripper_left_down", b"gripper_left_down"):
+        set_gripper(gripper_left, LEFT_DOWN)
+    elif action in (b"gripper_left_pos", b"gripper_left_pos") and value is not None:
+        set_gripper(gripper_left, value)
+
+    elif action in (b"gripper_right_up", b"gripper_right_up"):
+        set_gripper(gripper_right, RIGHT_UP)
+    elif action in (b"gripper_right_down", b"gripper_right_down"):
+        set_gripper(gripper_right, RIGHT_DOWN)
+    elif action in (b"gripper_right_pos", b"gripper_right_pos") and value is not None:
+        set_gripper(gripper_right, -clamp_user_pos_0_90(value))
 
     elif action == b"line_follow_left" and value is not None:
         follow_line(b"left", value)

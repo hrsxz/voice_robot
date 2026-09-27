@@ -10,17 +10,32 @@ HUB_NAME = "Pybricks Hub"
 async def main():
 
     ready_event = asyncio.Event()
+    rx_buffer = b""
+    loop = asyncio.get_running_loop()
 
     def handle_rx(_, data):
+        nonlocal rx_buffer
 
-        if data[0] == 0x01:
+        if not data or data[0] != 0x01:
+            return
 
-            payload = data[1:]
-            if payload == b"rdy":
-                ready_event.set()
+        rx_buffer += data[1:]
 
-            else:
-                print("Hub:", payload)
+        while True:
+            idx = rx_buffer.find(b"rdy")
+            if idx < 0:
+                break
+
+            head = rx_buffer[:idx].strip()
+            rx_buffer = rx_buffer[idx + 3:]
+
+            loop.call_soon_threadsafe(ready_event.set)
+
+            if head:
+                try:
+                    print("Hub:", head.decode())
+                except Exception:
+                    print("Hub:", head)
 
     device = await BleakScanner.find_device_by_name(HUB_NAME)
 

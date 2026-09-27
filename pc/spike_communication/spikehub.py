@@ -14,6 +14,11 @@ class SpikeHub:
         # Hub 发来 rdy 时 set()
         self.ready_event = asyncio.Event()
 
+        # 新增: BLE 通知分包缓冲
+        self.rx_buffer = b""
+        # 新增: 主事件循环引用，用于线程安全 set()
+        self.loop = None
+
     async def connect(self):
         if self.simulate:
             print("[SIM] SpikeHub simulation mode: connected (no BLE)")
@@ -34,6 +39,12 @@ class SpikeHub:
         self.client = BleakClient(device)
 
         await self.client.connect()
+        
+        # 新增: 保存当前 running loop，供 notify 回调线程安全调度
+        self.loop = asyncio.get_running_loop()
+        self.rx_buffer = b""
+        self.ready_event.clear()
+
         await self.client.start_notify(
             self.UUID,
             self.handle_rx
@@ -57,31 +68,44 @@ class SpikeHub:
         """
         接收 Hub 发来的数据
         """
-
         if not data:
             return
 
-        if data[0] == 0x01:
+        if data[0] != 0x01:
+            return
 
-            payload = data[1:]
+        payload = data[1:]
+        # 新增: 先入缓冲，支持 OKrd + y 这种跨包
+        self.rx_buffer += payload
 
-            if payload == b"rdy":
-                # 在 notify 回调线程中安全地 set
+        while True:
+            idx = self.rx_buffer.find(b"rdy")
+            if idx < 0:
+                break
+
+            # rdy 前面的内容作为普通输出
+            head = self.rx_buffer[:idx].strip()
+            # 消费到 rdy 末尾
+            self.rx_buffer = self.rx_buffer[idx + 3:]
+
+            # 识别到 rdy 后释放等待
+            try:
+                if self.loop is not None:
+                    self.loop.call_soon_threadsafe(self.ready_event.set)
+                else:
+                    self.ready_event.set()
+            except Exception:
+                pass
+
+            if head:
                 try:
-                    loop = asyncio.get_event_loop()
-                    loop.call_soon_threadsafe(self.ready_event.set)
+                    print("Hub:", head.decode())
                 except Exception:
-                    # fallback
-                    try:
-                        self.ready_event.set()
-                    except Exception:
-                        pass
+                    print("Hub:", head)
 
-            else:
-                try:
-                    print("Hub:", payload.decode())
-                except Exception:
-                    print("Hub:", payload)
+        # 可选: 防止极端情况下缓冲无限增长
+        if len(self.rx_buffer) > 4096:
+            self.rx_buffer = self.rx_buffer[-1024:]
 
     async def send(self, cmd: str):
         """
@@ -96,7 +120,7 @@ class SpikeHub:
             return
 
         # 等待 Hub 发出 rdy
-        await self.ready_event.wait()
+        await asyncio.wait_for(self.ready_event.wait(), timeout=3.0)
 
         # 为下一次发送做准备
         self.ready_event.clear()

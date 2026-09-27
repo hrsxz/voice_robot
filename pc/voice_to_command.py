@@ -105,7 +105,7 @@ class VoiceController:
 
 if __name__ == '__main__':
     # Initialize SpikeHub in simulation mode for testing
-    voice_controller = VoiceController(spike_simulation=True)
+    voice_controller = VoiceController(spike_simulation=False)
 
     try:
         asyncio.run(
