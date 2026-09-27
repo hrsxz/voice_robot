@@ -21,7 +21,7 @@ class VoiceController:
 
         if mode in ("mic", "microphone"):
             wav_path = await self.audio_client.record_push_to_talk()
-            # 鍚屾椂灏濊瘯鏈湴 whisper 鍜� OpenAI Whisper锛屽彇缁撴灉杈冨ソ鐨勪竴涓�
+            # Try transcribing with both Whisper and OpenAI, and choose the first successful result.
             out = {"whisper": None, "openai": None, "errors": {}}
             try:
                 out["whisper"] = await self.audio_client.transcribe_whisper(wav_path)
@@ -34,7 +34,7 @@ class VoiceController:
             except Exception as e:
                 out["errors"]["openai"] = str(e)
 
-            # 閫夋嫨缁撴灉杈冨ソ鐨勪竴涓�
+            # Choose the first successful result
             text = out["openai"] or out["whisper"] or ""
             return utils.normalize_text(text)
 
@@ -55,7 +55,7 @@ class VoiceController:
                 # input text: 前进30cm 左转60度，夹子60度
                 print('input text:', input_text)
 
-                # step 2锛� call LLM to generate intent JSON
+                # step 2 call LLM to generate intent JSON
                 llm_out = await self.llm_client.generate(input_text, model=llm_model)
                 # LLM output: {
                 #   "steps":[
@@ -65,7 +65,7 @@ class VoiceController:
                 # }
                 print('LLM output:', llm_out)
 
-                # step 3锛� parse intent from LLM output
+                # step 3 parse intent from LLM output
                 intent = intent_parser.parse_intent(llm_out)
                 # parsed intent: {
                 #   'steps': [
@@ -75,7 +75,7 @@ class VoiceController:
                 # }
                 print('parsed intent:', intent)
 
-                # step 4锛� convert intent to sequence and execute
+                # step 4 convert intent to sequence and execute
                 seq = intent_mapper.intent_to_sequence(intent)
                 # sequence: {
                 #   'sequence': [
@@ -85,7 +85,7 @@ class VoiceController:
                 # }
                 print('sequence:', seq)
 
-                # step 5锛� execute the sequence of commands on the SpikeHub
+                # step 5 execute the sequence of commands on the SpikeHub
                 exec_result = await self.robot_agent.execute_sequence(seq)
                 # Executed command: forward 30
                 # Executed command: left 60                                                           

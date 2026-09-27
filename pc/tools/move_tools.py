@@ -12,10 +12,27 @@ async def execute(args: dict) -> dict:
     if not action:
         return {"status": "error", "detail": "missing action"}
 
-    no_value_actions = {"stop", "gripper_up", "gripper_down"}
+    no_value_actions = {
+        "stop",
+        "gripper_up",
+        "gripper_down",
+        "gripper_left_up",
+        "gripper_left_down",
+        "gripper_right_up",
+        "gripper_right_down",}
     int_value_actions = {
-        "forward", "backward", "straightforward", "straightbackward",
-        "left", "right", "face_to", "gripper_pos"
+        "forward",
+        "backward",
+        "straightforward",
+        "straightbackward",
+        "left",
+        "right",
+        "face_to",
+        "gripper_pos",
+        "gripper_left_pos",
+        "gripper_right_pos",
+        "line_follow_left",
+        "line_follow_right",
     }
 
     if action in no_value_actions:

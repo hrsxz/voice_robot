@@ -28,6 +28,14 @@ input_schema:
         - gripper_up
         - gripper_down
         - gripper_pos
+        - gripper_left_up
+        - gripper_left_down
+        - gripper_left_pos
+        - gripper_right_up
+        - gripper_right_down
+        - gripper_right_pos
+        - line_follow_left
+        - line_follow_right
     args:
       type: object
       properties:
@@ -47,7 +55,8 @@ input_schema:
     - if:
         properties:
           action:
-            enum: [forward, backward, straightforward, straightbackward]
+            enum: [forward, backward, straightforward, straightbackward,
+                   line_follow_left, line_follow_right]
       then:
         properties:
           args:
@@ -55,7 +64,8 @@ input_schema:
     - if:
         properties:
           action:
-            enum: [left, right, face_to, gripper_pos]
+            enum: [left, right, face_to, gripper_pos,
+                   gripper_left_pos, gripper_right_pos]
       then:
         properties:
           args:
@@ -63,7 +73,9 @@ input_schema:
     - if:
         properties:
           action:
-            enum: [stop, gripper_up, gripper_down]
+            enum: [stop, gripper_up, gripper_down,
+                   gripper_left_up, gripper_left_down,
+                   gripper_right_up, gripper_right_down]
       then:
         properties:
           args:
@@ -133,6 +145,45 @@ action_rules:
     arg_key: angle_deg
     min: 0
     max: 360
+  gripper_left_up:
+    route: move
+    value_type: none
+  gripper_left_down:
+    route: move
+    value_type: none
+  gripper_left_pos:
+    route: move
+    value_type: int
+    arg_key: angle_deg
+    min: 0
+    max: 90
+
+  gripper_right_up:
+    route: move
+    value_type: none
+  gripper_right_down:
+    route: move
+    value_type: none
+  gripper_right_pos:
+    route: move
+    value_type: int
+    arg_key: angle_deg
+    min: 0
+    max: 90
+
+  line_follow_left:
+    route: move
+    value_type: int
+    arg_key: distance_cm
+    min: 1
+    max: 10000
+  line_follow_right:
+    route: move
+    value_type: int
+    arg_key: distance_cm
+    min: 1
+    max: 10000
+
 runtime: pc.tools.move_tools:execute
 examples:
   - nl: "向前走 30 厘米"

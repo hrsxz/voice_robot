@@ -48,11 +48,13 @@ def _normalize_step(obj: dict) -> dict | None:
     else:
         payload = {}
 
-    if action in ("forward", "backward", "straightforward", "straightbackward"):
+    if action in ("forward", "backward", "straightforward", "straightbackward",
+                  "line_follow_left", "line_follow_right",):
         distance = _to_int_or_none(payload.get("distance_cm"))
         return {"action": action, "args": {"distance_cm": distance}}
 
-    if action in ("left", "right", "face_to", "gripper_pos"):
+    if action in ("left", "right", "face_to", "gripper_pos",
+                  "gripper_left_pos", "gripper_right_pos",):
         angle = _to_int_or_none(payload.get("angle_deg"))
         return {"action": action, "args": {"angle_deg": angle}}
 
@@ -70,6 +72,11 @@ def _normalize_step(obj: dict) -> dict | None:
         if name not in ("distance", "color", "gyro"):
             name = "distance"
         return {"action": action, "args": {"name": name}}
+
+    if action in ("stop", "gripper_up", "gripper_down",
+                  "gripper_left_up", "gripper_left_down",
+                  "gripper_right_up", "gripper_right_down",):
+        return {"action": action, "args": {}}
 
     return None
 
@@ -116,16 +123,37 @@ def _fallback_steps_from_text(text: str) -> list[dict]:
         action: str | None = None
         if any(k in clause for k in ("停", "停止", "stop")):
             action = "stop"
+        elif any(k in clause for k in ("前", "forward", "ahead")):
+            action = "forward"
+        elif any(k in clause for k in ("后", "后退", "backward")):
+            action = "backward"
+        elif any(k in clause for k in ("line_follow_left", "line follow left", "左侧巡线")):
+            action = "line_follow_left"
+        elif any(k in clause for k in ("line_follow_right", "line follow right", "右侧巡线")):
+            action = "line_follow_right"
+        elif any(k in clause for k in ("gripper_left_up", "left gripper up", "左夹爪抬起")):
+            action = "gripper_left_up"
+        elif any(k in clause for k in ("gripper_left_down", "left gripper down", "左夹爪放下")):
+            action = "gripper_left_down"
+        elif any(k in clause for k in ("gripper_right_up", "right gripper up", "右夹爪抬起")):
+            action = "gripper_right_up"
+        elif any(k in clause for k in ("gripper_right_down", "right gripper down", "右夹爪放下")):
+            action = "gripper_right_down"
+
         elif any(k in clause for k in ("gripper_up", "gripper up")):
             action = "gripper_up"
         elif any(k in clause for k in ("gripper_down", "gripper down")):
             action = "gripper_down"
         elif any(k in clause for k in ("gripper_pos", "gripper pos")):
             action = "gripper_pos"
-        elif any(k in clause for k in ("前", "forward", "ahead")):
-            action = "forward"
-        elif any(k in clause for k in ("后", "后退", "backward")):
-            action = "backward"
+        elif any(k in clause for k in (
+            "gripper_left_pos", "left gripper pos", "左夹爪转到"
+        )):
+            action = "gripper_left_pos"
+        elif any(k in clause for k in (
+            "gripper_right_pos", "right gripper pos", "右夹爪转到"
+        )):
+            action = "gripper_right_pos"
         elif any(k in clause for k in ("左", "left")):
             action = "left"
         elif any(k in clause for k in ("右", "right")):
@@ -135,17 +163,26 @@ def _fallback_steps_from_text(text: str) -> list[dict]:
             continue
 
         p = _extract_params(clause)
-        if action in ("forward", "backward"):
+        if action in ("forward", "backward", "line_follow_left", "line_follow_right",):
             step = {"action": action, "args": {"distance_cm": p.get("distance_cm")}}
-        elif action in ("left", "right"):
-            step = {"action": action, "args": {"angle_deg": p.get("angle_deg")}}
-        elif action in ("gripper_up", "gripper_down"):
-            step = {"action": action, "args": {}}
-        elif action == "gripper_pos":
+        elif action in ("left", "right", "gripper_pos",
+                        "gripper_left_pos", "gripper_right_pos",):
             angle = p.get("angle_deg")
             if angle is None:
+                # 裸数字由 _extract_params 暂存为 distance_cm
                 angle = p.get("distance_cm")
+
             step = {"action": action, "args": {"angle_deg": angle}}
+        elif action in (
+            "stop",
+            "gripper_up",
+            "gripper_down",
+            "gripper_left_up",
+            "gripper_left_down",
+            "gripper_right_up",
+            "gripper_right_down",
+        ):
+            step = {"action": action, "args": {}}
         else:
             step = {"action": "stop", "args": {}}
 
@@ -156,34 +193,110 @@ def _fallback_steps_from_text(text: str) -> list[dict]:
 
 def _normalize_action(action: str) -> str | None:
     value = action.strip().lower()
-    if value in ("forward", "f", "go forward", "ahead"):
-        return "forward"
-    if value in ("backward", "b", "back"):
-        return "backward"
-    if value in ("straightforward",):
-        return "straightforward"
-    if value in ("straightbackward",):
-        return "straightbackward"
-    if value in ("left", "l", "left turn", "turn_left"):
-        return "left"
-    if value in ("right", "r", "right turn", "turn_right"):
-        return "right"
-    if value in ("face_to", "face", "look at"):
-        return "face_to"
-    if value in ("stop", "hold"):
-        return "stop"
-    if value == "gripper up":
-        return "gripper_up"
-    if value == "gripper down":
-        return "gripper_down"
-    if value == "gripper pos":
-        return "gripper_pos"
-    if value in ("gripper_up", "gripper_down", "gripper_pos"):
-        return value
-    if value in ("camera", "photo", "take_photo", "take picture", "拍照", "照相"):
-        return "camera"
-    if value in ("sensor", "read_sensor", "读取传感器"):
-        return "sensor"
+
+    aliases = {
+        # 移动
+        "forward": "forward",
+        "f": "forward",
+        "go forward": "forward",
+        "ahead": "forward",
+
+        "backward": "backward",
+        "b": "backward",
+        "back": "backward",
+
+        "straightforward": "straightforward",
+        "straightbackward": "straightbackward",
+
+        # 转向
+        "left": "left",
+        "l": "left",
+        "left turn": "left",
+        "turn_left": "left",
+
+        "right": "right",
+        "r": "right",
+        "right turn": "right",
+        "turn_right": "right",
+
+        "face_to": "face_to",
+        "face": "face_to",
+        "look at": "face_to",
+
+        # 停止
+        "stop": "stop",
+        "hold": "stop",
+
+        # 同时控制两个夹爪
+        "gripper_up": "gripper_up",
+        "gripper up": "gripper_up",
+        "gripper_down": "gripper_down",
+        "gripper down": "gripper_down",
+        "gripper_pos": "gripper_pos",
+        "gripper pos": "gripper_pos",
+
+        # 左夹爪，B 口
+        "gripper_left_up": "gripper_left_up",
+        "gripper left up": "gripper_left_up",
+        "left gripper up": "gripper_left_up",
+        "左夹爪抬起": "gripper_left_up",
+        "抬起左夹爪": "gripper_left_up",
+
+        "gripper_left_down": "gripper_left_down",
+        "gripper left down": "gripper_left_down",
+        "left gripper down": "gripper_left_down",
+        "左夹爪放下": "gripper_left_down",
+        "放下左夹爪": "gripper_left_down",
+
+        "gripper_left_pos": "gripper_left_pos",
+        "gripper left pos": "gripper_left_pos",
+        "left gripper pos": "gripper_left_pos",
+
+        # 右夹爪，F 口
+        "gripper_right_up": "gripper_right_up",
+        "gripper right up": "gripper_right_up",
+        "right gripper up": "gripper_right_up",
+        "右夹爪抬起": "gripper_right_up",
+        "抬起右夹爪": "gripper_right_up",
+
+        "gripper_right_down": "gripper_right_down",
+        "gripper right down": "gripper_right_down",
+        "right gripper down": "gripper_right_down",
+        "右夹爪放下": "gripper_right_down",
+        "放下右夹爪": "gripper_right_down",
+
+        "gripper_right_pos": "gripper_right_pos",
+        "gripper right pos": "gripper_right_pos",
+        "right gripper pos": "gripper_right_pos",
+
+        # 巡线
+        "line_follow_left": "line_follow_left",
+        "line follow left": "line_follow_left",
+        "沿左侧巡线": "line_follow_left",
+        "沿黑线左边行走": "line_follow_left",
+
+        "line_follow_right": "line_follow_right",
+        "line follow right": "line_follow_right",
+        "沿右侧巡线": "line_follow_right",
+        "沿黑线右边行走": "line_follow_right",
+
+        # 相机
+        "camera": "camera",
+        "photo": "camera",
+        "take_photo": "camera",
+        "take picture": "camera",
+        "拍照": "camera",
+        "照相": "camera",
+
+        # 传感器
+        "sensor": "sensor",
+        "read_sensor": "sensor",
+        "读取传感器": "sensor",
+    }
+
+    if value in aliases:
+        return aliases[value]
+
     return None
 
 
