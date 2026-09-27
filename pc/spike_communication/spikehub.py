@@ -10,7 +10,6 @@ class SpikeHub:
         self.HUB_NAME = hub_name
         self.client = None
         self.simulate = bool(simulate)
-        self.loop = None
 
         # Hub 发来 rdy 时 set()
         self.ready_event = asyncio.Event()
@@ -27,7 +26,6 @@ class SpikeHub:
             return
 
         print("Searching hub...")
-        self.loop = asyncio.get_running_loop()
 
         device = await BleakScanner.find_device_by_name(self.HUB_NAME)
         if device is None:
@@ -67,22 +65,19 @@ class SpikeHub:
 
             payload = data[1:]
 
-            if b"rdy" in payload:
-                # Hub 可能把 OK 和下一轮 rdy 合并在同一帧里发回来，例如 OKrdy。
+            if payload == b"rdy":
+                # 在 notify 回调线程中安全地 set
                 try:
-                    if self.loop is not None:
-                        self.loop.call_soon_threadsafe(self.ready_event.set)
-                    else:
-                        self.ready_event.set()
+                    loop = asyncio.get_event_loop()
+                    loop.call_soon_threadsafe(self.ready_event.set)
                 except Exception:
+                    # fallback
                     try:
                         self.ready_event.set()
                     except Exception:
                         pass
 
-                payload = payload.replace(b"rdy", b"")
-
-            if payload:
+            else:
                 try:
                     print("Hub:", payload.decode())
                 except Exception:
@@ -90,7 +85,7 @@ class SpikeHub:
 
     async def send(self, cmd: str):
         """
-        发送字符串命令，并等待 Hub 再次发出 rdy。
+        发送字符串命令
         """
 
         if self.simulate:
@@ -106,18 +101,11 @@ class SpikeHub:
         # 为下一次发送做准备
         self.ready_event.clear()
 
-        client = self.client
-        if client is None:
-            raise RuntimeError("Spike Hub is not connected")
-
-        await client.write_gatt_char(
+        await self.client.write_gatt_char(
             self.UUID,
             b"\x06" + (cmd + "\n").encode(),
             response=True
         )
-
-        # 命令执行完成后，Hub 会在下一轮循环重新发出 rdy。
-        await self.ready_event.wait()
 
 
 # ----- CLI / demo runner -----

@@ -2,6 +2,7 @@
 id: camera
 name: Camera
 description: "拍照或录制视频"
+version: "1.0"
 triggers:
   - camera
   - 拍照
@@ -11,13 +12,24 @@ permissions: low
 input_schema:
   type: object
   properties:
-    mode:
+    action:
       type: string
       enum:
-        - photo
-        - video
+        - camera
+    args:
+      type: object
+      properties:
+        mode:
+          type: string
+          enum:
+            - photo
+            - video
+      required:
+        - mode
+      additionalProperties: false
   required:
-    - mode
+    - action
+    - args
 output_schema:
   type: object
   properties:
@@ -25,14 +37,26 @@ output_schema:
       type: string
     path:
       type: string
-runtime: tools.camera_tools:execute
+action_rules:
+  camera:
+    route: camera
+    value_type: str
+    arg_key: mode
+    allowed:
+      - photo
+      - video
+runtime: pc.tools.camera_tools:execute
 examples:
   - nl: "拍一张照片"
     command:
       action: camera
-      params:
+      args:
         mode: photo
-version: "1.0"
+  - nl: "录制视频"
+    command:
+      action: camera
+      args:
+        mode: video
 ---
 
 # 使用说明
@@ -41,23 +65,25 @@ version: "1.0"
 
 NL 示例:
 
-- "拍一张照片" → {"action":"camera","params":{"mode":"photo"}}
+- "拍一张照片" -> {"action":"camera","args":{"mode":"photo"}}
+- "录制视频" -> {"action":"camera","args":{"mode":"video"}}
 
 直接调用示例:
 
 ```python
-from tools import camera_tools  # 或根据项目结构使用 `from pc.tools import camera_tools`
-res = camera_tools.execute({"mode":"photo"})
-# 可能返回: {"status":"ok","path":"/tmp/photo.jpg"} 或 {"status":"error","detail":"camera busy"}
+from pc.tools import camera_tools
+
+res = await camera_tools.execute({"mode": "photo", "dry_run": True})
+# 可能返回: {"status":"ok","path":"captures/photo_*.jpg","detail":"simulated photo"}
 ```
 
 注意:
 
 - `mode` 支持 `photo` 或 `video`。
-- 支持可选 `dry_run` 参数用于测试：`{"mode":"photo","dry_run":true}` 会返回模拟结果。
-- 摄像头可能需要预热，首次调用延迟较大。
-- 错误返回格式为 `{"status":"error","detail":"..."}`，高风险操作应在 agent 层做二次确认。
+- 当前实现中 `video` 会返回未实现错误。
+- `dry_run` 默认是 `true`，便于无硬件调试。
+- 错误返回格式为 `{"status":"error","detail":"..."}`。
 
 测试:
 
-- 若无硬件，可实现一个模拟的 `tools.camera_tools.execute` 返回 `{"status":"ok","path":"<simulated>"}` 用于开发与单元测试。
+- 当前 `dry_run=true` 已提供模拟返回，可直接用于联调。

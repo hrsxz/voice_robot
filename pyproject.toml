@@ -11,9 +11,11 @@ dependencies = [
     "edge-tts>=7.2.8",
     "ollama-client>=0.1.0",
     "openai>=2.43.0",
+    "opencv-contrib-python>=5.0.0.93",
     "pygame>=2.6.1",
     "pynput>=1.8.2",
     "pyttsx3>=2.99",
+    "pyyaml>=6.0.3",
     "sounddevice>=0.5.5",
     "soundfile>=0.14.0",
     "truststore>=0.10.4",
@@ -23,6 +25,7 @@ dependencies = [
 dev = [
     "pylint>=4.0.6",
     "flake8-pyproject>=1.2.4",
+    "types-PyYAML>=6.0.12.20250915",
 ]
 
 [tool.flake8]
@@ -37,4 +40,5 @@ disable = [
     "W1202", # logging-not-lazy
     "E0611", # no-name-in-module
     "W0718", # broad-exception-caught
+    "W0105", # string statement has no effect
 ]

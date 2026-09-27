@@ -46,13 +46,13 @@ class VoiceController:
         llm_model: str | None,
         run_once: bool = True,
     ) -> None:
-        # step 0锛� connect to SpikeHub
+        # step 0: connect to SpikeHub
         await self.robot_agent.connect()
         try:
             while True:
-                # step 1锛� parse input text from mic or cli
+                # step 1: parse input text from mic or cli
                 input_text = await self.get_input_text(mode)
-                # input text: 鍓嶈蛋30cm 宸﹁浆60搴�
+                # input text: 前进30cm 左转60度，夹子60度
                 print('input text:', input_text)
 
                 # step 2锛� call LLM to generate intent JSON
@@ -105,7 +105,7 @@ class VoiceController:
 
 if __name__ == '__main__':
     # Initialize SpikeHub in simulation mode for testing
-    voice_controller = VoiceController(spike_simulation=False)
+    voice_controller = VoiceController(spike_simulation=True)
 
     try:
         asyncio.run(

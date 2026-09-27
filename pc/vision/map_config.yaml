@@ -1,0 +1,22 @@
+map:
+  width_cm: 237
+  height_cm: 115
+
+# marker 中心点 的真实位置
+# 地图: 4 个 ArUco marker
+# robot: 2 个 ArUco marker，贴在左边和右边
+# 地图 marker: 8cm x 8cm
+# robot marker: 5cm x 5cm 或 6cm x 6cm
+anchors:
+  10:
+    x_cm: 4
+    y_cm: 4
+  11:
+    x_cm: 233
+    y_cm: 4
+  12:
+    x_cm: 233
+    y_cm: 111
+  13:
+    x_cm: 4
+    y_cm: 111
