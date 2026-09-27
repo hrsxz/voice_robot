@@ -1,1 +1,6 @@
 /*.env
+/pc/__pycache__
+/pc/agent/__pycache__/*.pyc
+/pc/llm/__pycache__/*.pyc
+/pc/speech/__pycache__/*.pyc
+/pc/spike_communication/__pycache__/*.pyc
