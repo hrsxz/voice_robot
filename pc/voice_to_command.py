@@ -90,7 +90,7 @@ class VoiceController:
                 # Executed command: forward 30
                 # Executed command: left 60                                                           
                 print("execute result:", exec_result)
-                # execute result: {                                                                                                                                    
+                # execute result: {
                 #   'status': 'ok',
                 #   'executed': ['forward 30', 'left 60'],
                 #   'skipped': [],

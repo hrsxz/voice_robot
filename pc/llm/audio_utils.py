@@ -44,7 +44,7 @@ class AudioClient:
                 'pip install sounddevice soundfile'
             ) from e
 
-        fs = 16000
+        fs = 44100
         print(f'Recording {duration}s to {tmp}...')
         data = sd.rec(int(duration * fs), samplerate=fs, channels=1)
         sd.wait()
@@ -148,56 +148,104 @@ class AudioClient:
 
     async def record_push_to_talk(self, out_path: str | None = None) -> str:
         import time
+        import threading
+        from collections import deque
 
+        import numpy as np
         import sounddevice as sd
         import soundfile as sf
         from pynput import keyboard
 
-        fs = 16000
+        fs = 44100
         channels = 1
-        frames = []
-        is_recording = False
-        stop_recording = False
-        space_down = False
+        blocksize = 1024
+        wait_press_seconds = 500.0
+        max_record_seconds = 60.0
+        pre_roll_ms = 500
+        post_roll_ms = 250
+
+        frames: list[np.ndarray] = []
+        pre_buffer = deque(
+            maxlen=max(1, int((pre_roll_ms / 1000.0) * fs / blocksize))
+        )
+
+        started = threading.Event()
+        released = threading.Event()
+        done = threading.Event()
+
+        post_chunks_target = max(1, int((post_roll_ms / 1000.0) * fs / blocksize))
+        post_chunks_seen = 0
 
         tmp = out_path or os.path.join(
             tempfile.gettempdir(), f"vr_ptt_{int(time.time())}.wav"
         )
 
+        def callback(indata, frame_count, time_info, status):
+            nonlocal post_chunks_seen
+            if status:
+                print(f"录音状态: {status}")
+
+            chunk = indata.copy()
+            pre_buffer.append(chunk)
+
+            if not started.is_set():
+                return
+
+            frames.append(chunk)
+
+            if released.is_set():
+                post_chunks_seen += 1
+                if post_chunks_seen >= post_chunks_target:
+                    done.set()
+
         def on_press(key):
-            nonlocal is_recording, space_down
-            if key == keyboard.Key.space and not space_down:
-                space_down = True
-                is_recording = True
+            if key == keyboard.Key.space and not started.is_set():
+                frames.extend(list(pre_buffer))
+                started.set()
                 print("开始录音...（松开空格结束）")
+            elif key == keyboard.Key.esc and started.is_set():
+                released.set()
+                done.set()
+                return False
 
         def on_release(key):
-            nonlocal stop_recording, space_down
-            if key == keyboard.Key.space and space_down:
-                space_down = False
-                stop_recording = True
-                return False  # 停止 listener
+            if key == keyboard.Key.space and started.is_set():
+                released.set()
+                return False
 
         print("请按住空格说话，松开结束。")
         listener = keyboard.Listener(on_press=on_press, on_release=on_release)
         listener.start()
 
-        # 等待真正开始
-        while not is_recording:
-            await asyncio.sleep(0.01)
+        try:
+            with sd.InputStream(
+                samplerate=fs,
+                channels=channels,
+                dtype="float32",
+                device=None,
+                blocksize=blocksize,
+                callback=callback,
+            ):
+                press_deadline = time.time() + wait_press_seconds
+                while not started.is_set():
+                    if time.time() >= press_deadline:
+                        raise RuntimeError("等待按下空格超时，请重试。")
+                    await asyncio.sleep(0.01)
 
-        with sd.InputStream(samplerate=fs, channels=channels, dtype="float32") as stream:
-            while not stop_recording:
-                data, _ = stream.read(1024)
-                frames.append(data.copy())
-                await asyncio.sleep(0)
-
-        listener.join()
+                record_start = time.time()
+                while not done.is_set():
+                    if time.time() - record_start >= max_record_seconds:
+                        print("录音超过30秒，自动停止。")
+                        done.set()
+                        break
+                    await asyncio.sleep(0.01)
+        finally:
+            listener.stop()
+            listener.join(timeout=1.0)
 
         if not frames:
             raise RuntimeError("没有录到音频，请重试。")
 
-        import numpy as np
         audio = np.concatenate(frames, axis=0)
         sf.write(tmp, audio, fs)
         print(f"录音保存: {tmp}")
