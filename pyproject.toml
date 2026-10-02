@@ -9,6 +9,7 @@ dependencies = [
     "bleak>=3.0.2",
     "dotenv>=0.9.9",
     "edge-tts>=7.2.8",
+    "faster-whisper>=1.2.1",
     "ollama-client>=0.1.0",
     "openai>=2.43.0",
     "opencv-contrib-python>=5.0.0.93",
@@ -16,9 +17,11 @@ dependencies = [
     "pynput>=1.8.2",
     "pyttsx3>=2.99",
     "pyyaml>=6.0.3",
+    "rapidfuzz>=3.14.6",
     "sounddevice>=0.5.5",
     "soundfile>=0.14.0",
     "truststore>=0.10.4",
+    "webrtcvad-wheels>=2.0.14",
 ]
 
 [dependency-groups]

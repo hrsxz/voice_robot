@@ -158,7 +158,7 @@ class LLMClient:
             resp = await self._openai_client.chat.completions.create(
                 model=model,  # gpt-5.4-mini # gpt-5.4 gpt-5.5
                 messages=[{"role": "user", "content": prompt}],
-                temperature=0.0,
+                # temperature=0.0,
             )
             return resp.choices[0].message.content or ""
         except AuthenticationError as e:
