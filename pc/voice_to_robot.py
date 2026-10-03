@@ -191,7 +191,7 @@ if __name__ == '__main__':
     try:
         asyncio.run(
             voice_controller.run(
-                mode='cli',  # mic cli wake
+                mode='mic',  # mic cli wake
                 stt_device="auto",  # Options: "auto", "cpu", "cuda"
                 llm_model="gpt-6-luna",  # https://developers.openai.com/api/docs/models
                 run_once=False,  # True for single command, False for continuous listening
