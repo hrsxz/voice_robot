@@ -1,5 +1,10 @@
 {
-    "pylint.enabled": true,
+    // Linter: ruff (配置在 pyproject.toml 的 [tool.ruff]); 本项目不再使用 pylint / flake8
+    "pylint.enabled": false,
+    "flake8.enabled": false,
+    "ruff.enable": true,
+    // 项目里的 ruff 配置优先于编辑器里的 ruff 设置
+    "ruff.configurationPreference": "filesystemFirst",
     "editor.rulers": [
         88,
         100
@@ -33,6 +38,7 @@
     "python.formatting.provider": "black",
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
-        "source.organizeImports": "explicit"
+        // 保存时用 ruff 整理 import (和 ruff 的 I 规则一致)
+        "source.organizeImports.ruff": "explicit"
     },
 }

@@ -40,6 +40,7 @@ output_schema:
 action_rules:
   camera:
     route: camera
+    description: "拍照（photo）或录像（video）"
     value_type: str
     arg_key: mode
     allowed:

@@ -23,11 +23,8 @@ async def execute(args: dict) -> dict:
     int_value_actions = {
         "forward",
         "backward",
-        "straightforward",
-        "straightbackward",
         "left",
         "right",
-        "face_to",
         "gripper_pos",
         "gripper_left_pos",
         "gripper_right_pos",
@@ -54,4 +51,5 @@ async def execute(args: dict) -> dict:
         await hub.send(cmd)
         return {"status": "ok", "detail": cmd}
     except Exception as exc:
-        return {"status": "error", "detail": f"hub send failed: {exc}"}
+        # error_type=comm: Hub 通信失败 (超时/断开/写入失败), 调用方据此跳过剩余命令
+        return {"status": "error", "detail": f"hub send failed: {exc}", "error_type": "comm"}

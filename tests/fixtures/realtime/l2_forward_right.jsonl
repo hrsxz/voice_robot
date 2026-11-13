@@ -1,0 +1,87 @@
+{"type": "session.created", "t_ms": 1}
+{"type": "session.updated", "t_ms": 91}
+{"type": "input_audio_buffer.committed", "item_id": "item_EjlA9AXg64Qneknb1XSaw", "t_ms": 366}
+{"type": "conversation.item.added", "t_ms": 368}
+{"type": "conversation.item.done", "t_ms": 368}
+{"type": "response.created", "response": {"id": "resp_EjlA9nigBFAHiY1Ghs38s", "status": "in_progress"}, "t_ms": 372}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlA9AXg64Qneknb1XSaw", "delta": "向", "t_ms": 610}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlA9AXg64Qneknb1XSaw", "delta": "前", "t_ms": 622}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlA9AXg64Qneknb1XSaw", "delta": "走", "t_ms": 632}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlA9AXg64Qneknb1XSaw", "delta": "五", "t_ms": 638}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlA9AXg64Qneknb1XSaw", "delta": "十", "t_ms": 645}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlA9AXg64Qneknb1XSaw", "delta": "厘米", "t_ms": 650}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlA9AXg64Qneknb1XSaw", "delta": "，然后", "t_ms": 666}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlA9AXg64Qneknb1XSaw", "delta": "向", "t_ms": 675}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlA9AXg64Qneknb1XSaw", "delta": "右", "t_ms": 686}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlA9AXg64Qneknb1XSaw", "delta": "转", "t_ms": 696}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlA9AXg64Qneknb1XSaw", "delta": "九", "t_ms": 736}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlA9AXg64Qneknb1XSaw", "delta": "十", "t_ms": 736}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlA9AXg64Qneknb1XSaw", "delta": "度", "t_ms": 737}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlA9AXg64Qneknb1XSaw", "delta": "。", "t_ms": 737}
+{"type": "response.output_item.added", "response_id": "resp_EjlA9nigBFAHiY1Ghs38s", "output_index": 0, "t_ms": 859}
+{"type": "conversation.item.added", "t_ms": 860}
+{"type": "response.function_call_arguments.delta", "item_id": "item_EjlA9ofCjDCWkCmt45XDv", "call_id": "call_o3K13KPtko9UXJ8f", "delta": "{", "response_id": "resp_EjlA9nigBFAHiY1Ghs38s", "output_index": 0, "t_ms": 860}
+{"type": "response.function_call_arguments.delta", "item_id": "item_EjlA9ofCjDCWkCmt45XDv", "call_id": "call_o3K13KPtko9UXJ8f", "delta": "  \n", "response_id": "resp_EjlA9nigBFAHiY1Ghs38s", "output_index": 0, "t_ms": 861}
+{"type": "response.function_call_arguments.delta", "item_id": "item_EjlA9ofCjDCWkCmt45XDv", "call_id": "call_o3K13KPtko9UXJ8f", "delta": " ", "response_id": "resp_EjlA9nigBFAHiY1Ghs38s", "output_index": 0, "t_ms": 867}
+{"type": "response.function_call_arguments.delta", "item_id": "item_EjlA9ofCjDCWkCmt45XDv", "call_id": "call_o3K13KPtko9UXJ8f", "delta": " \"", "response_id": "resp_EjlA9nigBFAHiY1Ghs38s", "output_index": 0, "t_ms": 868}
+{"type": "response.function_call_arguments.delta", "item_id": "item_EjlA9ofCjDCWkCmt45XDv", "call_id": "call_o3K13KPtko9UXJ8f", "delta": "distance", "response_id": "resp_EjlA9nigBFAHiY1Ghs38s", "output_index": 0, "t_ms": 870}
+{"type": "response.function_call_arguments.delta", "item_id": "item_EjlA9ofCjDCWkCmt45XDv", "call_id": "call_o3K13KPtko9UXJ8f", "delta": "_cm", "response_id": "resp_EjlA9nigBFAHiY1Ghs38s", "output_index": 0, "t_ms": 870}
+{"type": "response.function_call_arguments.delta", "item_id": "item_EjlA9ofCjDCWkCmt45XDv", "call_id": "call_o3K13KPtko9UXJ8f", "delta": "\":", "response_id": "resp_EjlA9nigBFAHiY1Ghs38s", "output_index": 0, "t_ms": 872}
+{"type": "response.function_call_arguments.delta", "item_id": "item_EjlA9ofCjDCWkCmt45XDv", "call_id": "call_o3K13KPtko9UXJ8f", "delta": " ", "response_id": "resp_EjlA9nigBFAHiY1Ghs38s", "output_index": 0, "t_ms": 891}
+{"type": "response.function_call_arguments.delta", "item_id": "item_EjlA9ofCjDCWkCmt45XDv", "call_id": "call_o3K13KPtko9UXJ8f", "delta": "50", "response_id": "resp_EjlA9nigBFAHiY1Ghs38s", "output_index": 0, "t_ms": 891}
+{"type": "response.function_call_arguments.delta", "item_id": "item_EjlA9ofCjDCWkCmt45XDv", "call_id": "call_o3K13KPtko9UXJ8f", "delta": "\n", "response_id": "resp_EjlA9nigBFAHiY1Ghs38s", "output_index": 0, "t_ms": 892}
+{"type": "response.function_call_arguments.delta", "item_id": "item_EjlA9ofCjDCWkCmt45XDv", "call_id": "call_o3K13KPtko9UXJ8f", "delta": "}", "response_id": "resp_EjlA9nigBFAHiY1Ghs38s", "output_index": 0, "t_ms": 898}
+{"type": "response.function_call_arguments.done", "item_id": "item_EjlA9ofCjDCWkCmt45XDv", "call_id": "call_o3K13KPtko9UXJ8f", "name": "forward", "arguments": "{  \n  \"distance_cm\": 50\n}", "response_id": "resp_EjlA9nigBFAHiY1Ghs38s", "output_index": 0, "t_ms": 903}
+{"type": "conversation.item.done", "t_ms": 904}
+{"type": "response.output_item.done", "response_id": "resp_EjlA9nigBFAHiY1Ghs38s", "output_index": 0, "t_ms": 907}
+{"type": "response.done", "response": {"id": "resp_EjlA9nigBFAHiY1Ghs38s", "status": "completed", "output": [{"type": "function_call", "name": "forward", "arguments": "{  \n  \"distance_cm\": 50\n}", "call_id": "call_o3K13KPtko9UXJ8f"}], "usage": {"input_token_details": {"audio_tokens": 61, "cached_tokens": 0, "cached_tokens_details": {"audio_tokens": 0, "image_tokens": 0, "text_tokens": 0}, "image_tokens": 0, "text_tokens": 828}, "input_tokens": 889, "output_token_details": {"audio_tokens": 0, "text_tokens": 20}, "output_tokens": 20, "total_tokens": 909}}, "t_ms": 908}
+{"type": "rate_limits.updated", "t_ms": 917}
+{"type": "conversation.item.input_audio_transcription.completed", "item_id": "item_EjlA9AXg64Qneknb1XSaw", "transcript": "向前走五十厘米，然后向右转九十度。", "t_ms": 951}
+{"type": "conversation.item.added", "t_ms": 1039}
+{"type": "conversation.item.done", "t_ms": 1040}
+{"type": "response.created", "response": {"id": "resp_EjlAA7VVltdykkaSBb32T", "status": "in_progress"}, "t_ms": 1054}
+{"type": "response.output_item.added", "response_id": "resp_EjlAA7VVltdykkaSBb32T", "output_index": 0, "t_ms": 1302}
+{"type": "conversation.item.added", "t_ms": 1303}
+{"type": "response.function_call_arguments.delta", "item_id": "item_EjlAA7luduQCDtb1YZeiL", "call_id": "call_zRb3wEleJlzRZRH5", "delta": "{", "response_id": "resp_EjlAA7VVltdykkaSBb32T", "output_index": 0, "t_ms": 1303}
+{"type": "response.function_call_arguments.delta", "item_id": "item_EjlAA7luduQCDtb1YZeiL", "call_id": "call_zRb3wEleJlzRZRH5", "delta": "  \n", "response_id": "resp_EjlAA7VVltdykkaSBb32T", "output_index": 0, "t_ms": 1354}
+{"type": "response.function_call_arguments.delta", "item_id": "item_EjlAA7luduQCDtb1YZeiL", "call_id": "call_zRb3wEleJlzRZRH5", "delta": " ", "response_id": "resp_EjlAA7VVltdykkaSBb32T", "output_index": 0, "t_ms": 1357}
+{"type": "response.function_call_arguments.delta", "item_id": "item_EjlAA7luduQCDtb1YZeiL", "call_id": "call_zRb3wEleJlzRZRH5", "delta": " \"", "response_id": "resp_EjlAA7VVltdykkaSBb32T", "output_index": 0, "t_ms": 1359}
+{"type": "response.function_call_arguments.delta", "item_id": "item_EjlAA7luduQCDtb1YZeiL", "call_id": "call_zRb3wEleJlzRZRH5", "delta": "angle", "response_id": "resp_EjlAA7VVltdykkaSBb32T", "output_index": 0, "t_ms": 1361}
+{"type": "response.function_call_arguments.delta", "item_id": "item_EjlAA7luduQCDtb1YZeiL", "call_id": "call_zRb3wEleJlzRZRH5", "delta": "_deg", "response_id": "resp_EjlAA7VVltdykkaSBb32T", "output_index": 0, "t_ms": 1362}
+{"type": "response.function_call_arguments.delta", "item_id": "item_EjlAA7luduQCDtb1YZeiL", "call_id": "call_zRb3wEleJlzRZRH5", "delta": "\":", "response_id": "resp_EjlAA7VVltdykkaSBb32T", "output_index": 0, "t_ms": 1363}
+{"type": "response.function_call_arguments.delta", "item_id": "item_EjlAA7luduQCDtb1YZeiL", "call_id": "call_zRb3wEleJlzRZRH5", "delta": " ", "response_id": "resp_EjlAA7VVltdykkaSBb32T", "output_index": 0, "t_ms": 1383}
+{"type": "response.function_call_arguments.delta", "item_id": "item_EjlAA7luduQCDtb1YZeiL", "call_id": "call_zRb3wEleJlzRZRH5", "delta": "90", "response_id": "resp_EjlAA7VVltdykkaSBb32T", "output_index": 0, "t_ms": 1389}
+{"type": "response.function_call_arguments.delta", "item_id": "item_EjlAA7luduQCDtb1YZeiL", "call_id": "call_zRb3wEleJlzRZRH5", "delta": "\n", "response_id": "resp_EjlAA7VVltdykkaSBb32T", "output_index": 0, "t_ms": 1390}
+{"type": "response.function_call_arguments.delta", "item_id": "item_EjlAA7luduQCDtb1YZeiL", "call_id": "call_zRb3wEleJlzRZRH5", "delta": "}", "response_id": "resp_EjlAA7VVltdykkaSBb32T", "output_index": 0, "t_ms": 1391}
+{"type": "response.function_call_arguments.done", "item_id": "item_EjlAA7luduQCDtb1YZeiL", "call_id": "call_zRb3wEleJlzRZRH5", "name": "right", "arguments": "{  \n  \"angle_deg\": 90\n}", "response_id": "resp_EjlAA7VVltdykkaSBb32T", "output_index": 0, "t_ms": 1409}
+{"type": "conversation.item.done", "t_ms": 1410}
+{"type": "response.output_item.done", "response_id": "resp_EjlAA7VVltdykkaSBb32T", "output_index": 0, "t_ms": 1411}
+{"type": "response.done", "response": {"id": "resp_EjlAA7VVltdykkaSBb32T", "status": "completed", "output": [{"type": "function_call", "name": "right", "arguments": "{  \n  \"angle_deg\": 90\n}", "call_id": "call_zRb3wEleJlzRZRH5"}], "usage": {"input_token_details": {"audio_tokens": 61, "cached_tokens": 832, "cached_tokens_details": {"audio_tokens": 0, "image_tokens": 0, "text_tokens": 832}, "image_tokens": 0, "text_tokens": 852}, "input_tokens": 913, "output_token_details": {"audio_tokens": 0, "text_tokens": 20}, "output_tokens": 20, "total_tokens": 933}}, "t_ms": 1412}
+{"type": "rate_limits.updated", "t_ms": 1427}
+{"type": "conversation.item.added", "t_ms": 1540}
+{"type": "conversation.item.done", "t_ms": 1541}
+{"type": "response.created", "response": {"id": "resp_EjlAAOaXEIEXlmbSBI69f", "status": "in_progress"}, "t_ms": 1562}
+{"type": "response.output_item.added", "response_id": "resp_EjlAAOaXEIEXlmbSBI69f", "output_index": 0, "t_ms": 1780}
+{"type": "conversation.item.added", "t_ms": 1781}
+{"type": "response.content_part.added", "item_id": "item_EjlAAQj7lgulKiF97JGYI", "response_id": "resp_EjlAAOaXEIEXlmbSBI69f", "output_index": 0, "t_ms": 1781}
+{"type": "response.output_text.delta", "item_id": "item_EjlAAQj7lgulKiF97JGYI", "delta": "好的", "response_id": "resp_EjlAAOaXEIEXlmbSBI69f", "output_index": 0, "t_ms": 1783}
+{"type": "response.output_text.delta", "item_id": "item_EjlAAQj7lgulKiF97JGYI", "delta": "，", "response_id": "resp_EjlAAOaXEIEXlmbSBI69f", "output_index": 0, "t_ms": 1790}
+{"type": "response.output_text.delta", "item_id": "item_EjlAAQj7lgulKiF97JGYI", "delta": "已经", "response_id": "resp_EjlAAOaXEIEXlmbSBI69f", "output_index": 0, "t_ms": 1793}
+{"type": "response.output_text.delta", "item_id": "item_EjlAAQj7lgulKiF97JGYI", "delta": "完成", "response_id": "resp_EjlAAOaXEIEXlmbSBI69f", "output_index": 0, "t_ms": 1794}
+{"type": "response.output_text.delta", "item_id": "item_EjlAAQj7lgulKiF97JGYI", "delta": "向", "response_id": "resp_EjlAAOaXEIEXlmbSBI69f", "output_index": 0, "t_ms": 1798}
+{"type": "response.output_text.delta", "item_id": "item_EjlAAQj7lgulKiF97JGYI", "delta": "前", "response_id": "resp_EjlAAOaXEIEXlmbSBI69f", "output_index": 0, "t_ms": 1804}
+{"type": "response.output_text.delta", "item_id": "item_EjlAAQj7lgulKiF97JGYI", "delta": "走", "response_id": "resp_EjlAAOaXEIEXlmbSBI69f", "output_index": 0, "t_ms": 1809}
+{"type": "response.output_text.delta", "item_id": "item_EjlAAQj7lgulKiF97JGYI", "delta": "50", "response_id": "resp_EjlAAOaXEIEXlmbSBI69f", "output_index": 0, "t_ms": 1812}
+{"type": "response.output_text.delta", "item_id": "item_EjlAAQj7lgulKiF97JGYI", "delta": "厘米", "response_id": "resp_EjlAAOaXEIEXlmbSBI69f", "output_index": 0, "t_ms": 1882}
+{"type": "response.output_text.delta", "item_id": "item_EjlAAQj7lgulKiF97JGYI", "delta": "，然后", "response_id": "resp_EjlAAOaXEIEXlmbSBI69f", "output_index": 0, "t_ms": 1882}
+{"type": "response.output_text.delta", "item_id": "item_EjlAAQj7lgulKiF97JGYI", "delta": "向", "response_id": "resp_EjlAAOaXEIEXlmbSBI69f", "output_index": 0, "t_ms": 1882}
+{"type": "response.output_text.delta", "item_id": "item_EjlAAQj7lgulKiF97JGYI", "delta": "右", "response_id": "resp_EjlAAOaXEIEXlmbSBI69f", "output_index": 0, "t_ms": 1885}
+{"type": "response.output_text.delta", "item_id": "item_EjlAAQj7lgulKiF97JGYI", "delta": "转", "response_id": "resp_EjlAAOaXEIEXlmbSBI69f", "output_index": 0, "t_ms": 1889}
+{"type": "response.output_text.delta", "item_id": "item_EjlAAQj7lgulKiF97JGYI", "delta": "90", "response_id": "resp_EjlAAOaXEIEXlmbSBI69f", "output_index": 0, "t_ms": 1889}
+{"type": "response.output_text.delta", "item_id": "item_EjlAAQj7lgulKiF97JGYI", "delta": "度", "response_id": "resp_EjlAAOaXEIEXlmbSBI69f", "output_index": 0, "t_ms": 1906}
+{"type": "response.output_text.delta", "item_id": "item_EjlAAQj7lgulKiF97JGYI", "delta": "。", "response_id": "resp_EjlAAOaXEIEXlmbSBI69f", "output_index": 0, "t_ms": 1919}
+{"type": "response.output_text.done", "item_id": "item_EjlAAQj7lgulKiF97JGYI", "response_id": "resp_EjlAAOaXEIEXlmbSBI69f", "output_index": 0, "t_ms": 1920}
+{"type": "response.content_part.done", "item_id": "item_EjlAAQj7lgulKiF97JGYI", "response_id": "resp_EjlAAOaXEIEXlmbSBI69f", "output_index": 0, "t_ms": 1923}
+{"type": "conversation.item.done", "t_ms": 1924}
+{"type": "response.output_item.done", "response_id": "resp_EjlAAOaXEIEXlmbSBI69f", "output_index": 0, "t_ms": 1924}
+{"type": "response.done", "response": {"id": "resp_EjlAAOaXEIEXlmbSBI69f", "status": "completed", "output": [{"type": "message", "text": "好的，已经完成向前走50厘米，然后向右转90度。"}], "usage": {"input_token_details": {"audio_tokens": 61, "cached_tokens": 832, "cached_tokens_details": {"audio_tokens": 0, "image_tokens": 0, "text_tokens": 832}, "image_tokens": 0, "text_tokens": 876}, "input_tokens": 937, "output_token_details": {"audio_tokens": 0, "text_tokens": 18}, "output_tokens": 18, "total_tokens": 955}}, "t_ms": 1924}

@@ -1,10 +1,53 @@
 import asyncio
 import os
+import re
+import ssl
 import tempfile
 import time
-from typing import Optional
+from typing import Any
 
-from openai import OpenAI
+import httpx
+import truststore
+from openai import AsyncOpenAI
+from rapidfuzz import fuzz
+
+# 按空格录音的采样率: 16 kHz 单声道 int16 对语音识别足够, 上传的数据量是 44.1 kHz float 的约 1/5
+PTT_SAMPLE_RATE = 16000
+STT_MODEL = "gpt-4o-transcribe"
+# 不加提示时模型会混入繁体字 (後、進、釐) 和同音错字 ("做四次" -> "坐四次"), 快速通道就认不出来了
+# (见 openspec/changes/voice-streaming/spike.md)
+# 左右夹子要写完整说法: 只写"把夹子放下来"时, 模型会把"左夹子放下来"也听成"把夹子放下来"
+STT_PROMPT = (
+    "请用简体中文输出。机器人控制命令：向前走，往后退，向左转，向右转，停止，"
+    "左夹子抬起来，左夹子放下来，右夹子抬起来，右夹子放下来，"
+    "把夹子抬起来，把夹子放下来，厘米，度，然后，再，一共做四次。"
+)
+
+# 音频很短或不清楚时, 模型有时会把提示词原样输出 ("向前走，往后退，……停止，……"),
+# 里面的"停止"会被当成急停 (见 openspec/changes/voice-input-modes/measurements.md)
+_PROMPT_CONTENT = re.sub(r"\W", "", STT_PROMPT)
+_ECHO_ANCHORS = (_PROMPT_CONTENT, _PROMPT_CONTENT[_PROMPT_CONTENT.index("向前走"):])
+
+
+def is_prompt_echo(text: str, partial: bool = False) -> bool:
+    """
+    识别结果是不是提示词的回显。
+    partial=True 用于识别中的中间文字: 只要开头 9 个字以上和提示词开头一致就算
+    (尽早拦截, 避免误急停)。
+    """
+    content = re.sub(r"\W", "", text or "")
+    min_len = 9 if partial else 12
+    if len(content) >= min_len and any(
+        fuzz.ratio(content, anchor[:len(content)]) >= 90 for anchor in _ECHO_ANCHORS
+    ):
+        return True
+    return not partial and len(content) >= 20 and any(
+        fuzz.ratio(content, anchor) >= 75 for anchor in _ECHO_ANCHORS
+    )
+
+
+# 提示音: (频率 Hz, 时长 ms)
+TONES = {"wake": (900, 250), "end": (500, 300)}
 
 try:
     # 项目内可能已有的 STT 实现
@@ -25,29 +68,46 @@ class AudioClient:
       ac.speak_text('你好')
     """
 
-    def __init__(self, provider: str = 'whisper', api_key: Optional[str] = None):
+    def __init__(self, provider: str = 'whisper', api_key: str | None = None):
         self.provider = provider
         self.api_key = api_key or os.getenv('OPENAI_API_KEY')
+        # 复用同一个异步客户端, 避免每次识别都重新建立连接
+        self._openai_client: Any = None
 
-    async def play_recording_start_tone(self) -> None:
-        await asyncio.to_thread(self._play_tone_sync, 900, 250)
+    def _get_openai_client(self) -> Any:
+        if self._openai_client is None:
+            verify: Any
+            try:
+                verify = truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+            except Exception:
+                verify = True  # 回退到默认 CA 验证
+            self._openai_client = AsyncOpenAI(
+                api_key=self.api_key,
+                http_client=httpx.AsyncClient(verify=verify, timeout=30.0),
+            )
+        return self._openai_client
 
-    async def play_recording_stop_tone(self) -> None:
-        await asyncio.to_thread(self._play_tone_sync, 500, 300)
+    def start_tone(self, kind: str) -> float:
+        """
+        在后台开始播放提示音, 立即返回提示音时长 (秒), 不等播放完。
+        kind: "wake" (唤醒成功, 可以说命令) / "end" (一句话结束)。
+        """
+        frequency, duration_ms = TONES[kind]
+        try:
+            import numpy as np
+            import sounddevice as sd
 
-    def _play_tone_sync(self, frequency: int, duration_ms: int) -> None:
-        import numpy as np
-        import sounddevice as sd
+            sample_rate = 44100
+            sample_count = int(sample_rate * duration_ms / 1000)
+            timeline = np.arange(sample_count) / sample_rate
+            audio = 0.35 * np.sin(2 * np.pi * frequency * timeline)
+            sd.play(audio.astype(np.float32), sample_rate)  # 不调用 sd.wait(), 不阻塞
+        except Exception as exc:
+            print(f"提示音播放失败：{exc}")
+            return 0.0
+        return duration_ms / 1000
 
-        sample_rate = 44100
-        sample_count = int(sample_rate * duration_ms / 1000)
-        timeline = np.arange(sample_count) / sample_rate
-        audio = 0.35 * np.sin(2 * np.pi * frequency * timeline)
-
-        sd.play(audio.astype(np.float32), sample_rate)
-        sd.wait()
-
-    async def record(self, duration: float = 3.0, out_path: Optional[str] = None) -> str:
+    async def record(self, duration: float = 3.0, out_path: str | None = None) -> str:
         """Record audio from default microphone and save as WAV.
         Returns path to WAV file.
         Requires `sounddevice` and `soundfile` packages.
@@ -78,16 +138,23 @@ class AudioClient:
     async def transcribe_openai(self, wav_path: str) -> str:
         if not self.api_key:
             raise RuntimeError("OPENAI_API_KEY not set")
-        client = OpenAI(api_key=self.api_key)
+        client = self._get_openai_client()
         with open(wav_path, "rb") as f:
-            resp = client.audio.transcriptions.create(model="gpt-4o-transcribe", file=f)
+            resp = await client.audio.transcriptions.create(
+                model=STT_MODEL, file=f, language="zh", prompt=STT_PROMPT
+            )
         if hasattr(resp, "text"):
-            return resp.text
-        if getattr(resp, "data", None):
-            return resp.data[0].get("text", "")
-        return str(resp)
+            text = resp.text
+        elif getattr(resp, "data", None):
+            text = resp.data[0].get("text", "")
+        else:
+            text = str(resp)
+        if is_prompt_echo(text):
+            print("[STT] 识别结果是提示词的回显（音频太短或不清楚），已丢弃")
+            return ""
+        return text
 
-    def speak_text(self, text: str, voice: Optional[str] = None) -> None:
+    def speak_text(self, text: str, voice: str | None = None) -> None:
         """Speak text using local TTS.
         Priority:
         1) pyttsx3 (offline, sync)
@@ -151,136 +218,18 @@ class AudioClient:
             try:
                 os.startfile(out_mp3)  # type: ignore[attr-defined]
                 return
-            except Exception:
+            except Exception as exc:
                 raise RuntimeError(
                     "edge-tts synthesized audio, but no playback backend found. "
                     f"Audio saved at: {out_mp3}"
-                )
+                ) from exc
 
         except Exception:
             pass
 
-        raise RuntimeError("No TTS backend available. Install pyttsx3 or edge-tts (+ pygame optional).")
-
-    async def record_until_silence(
-        self,
-        out_path: str | None = None,
-        wait_timeout_seconds: float = 30.0,
-        max_record_seconds: float = 30.0,
-    ) -> str:
-        return await asyncio.to_thread(
-            self._record_until_silence_sync,
-            out_path,
-            wait_timeout_seconds,
-            max_record_seconds,
+        raise RuntimeError(
+            "No TTS backend available. Install pyttsx3 or edge-tts (+ pygame optional)."
         )
-
-    def _record_until_silence_sync(
-        self,
-        out_path: str | None = None,
-        wait_timeout_seconds: float = 30.0,
-        max_record_seconds: float = 30.0,
-    ) -> str:
-        import queue
-        from collections import deque
-
-        import numpy as np
-        import sounddevice as sd
-        import soundfile as sf
-        import webrtcvad
-
-        sample_rate = 16000
-        frame_ms = 30
-        blocksize = sample_rate * frame_ms // 1000
-        # wait_timeout_seconds = 30.0
-        # max_record_seconds = 30.0
-
-        pre_roll_frames = 10
-        start_window_frames = 5
-        required_voice_frames = 3
-        stop_silence_frames = 67  # 大约 2000 ms
-
-        vad = webrtcvad.Vad(2)
-        audio_queue: queue.Queue[bytes] = queue.Queue()
-
-        pre_buffer: deque[bytes] = deque(maxlen=pre_roll_frames)
-        voice_window: deque[bool] = deque(maxlen=start_window_frames)
-        recorded_frames: list[bytes] = []
-
-        started = False
-        silence_frames = 0
-        record_started_at = 0.0
-        wait_deadline = time.monotonic() + wait_timeout_seconds
-
-        output_path = out_path or os.path.join(
-            tempfile.gettempdir(),
-            f"vr_vad_{time.time_ns()}.wav",
-        )
-
-        def callback(indata, frame_count, time_info, status):
-            del frame_count, time_info
-
-            if status:
-                print(f"录音状态: {status}")
-
-            audio_queue.put(bytes(indata))
-
-        print("等待说话...")
-
-        with sd.RawInputStream(
-            samplerate=sample_rate,
-            channels=1,
-            dtype="int16",
-            blocksize=blocksize,
-            callback=callback,
-        ):
-            while True:
-                now = time.monotonic()
-
-                if not started and now >= wait_deadline:
-                    raise TimeoutError("等待语音超时")
-
-                if started and now - record_started_at >= max_record_seconds:
-                    print("达到单句最长录音时间，自动结束。")
-                    break
-
-                try:
-                    frame = audio_queue.get(timeout=0.5)
-                except queue.Empty:
-                    continue
-
-                is_speech = vad.is_speech(frame, sample_rate)
-
-                if not started:
-                    pre_buffer.append(frame)
-                    voice_window.append(is_speech)
-
-                    if sum(voice_window) >= required_voice_frames:
-                        started = True
-                        record_started_at = time.monotonic()
-                        recorded_frames.extend(pre_buffer)
-                        print("检测到语音，开始录音...")
-                    continue
-
-                recorded_frames.append(frame)
-
-                if is_speech:
-                    silence_frames = 0
-                else:
-                    silence_frames += 1
-
-                if silence_frames >= stop_silence_frames:
-                    print("检测到句末静音，结束录音。")
-                    break
-
-        if not recorded_frames:
-            raise RuntimeError("没有录到有效语音")
-
-        audio = np.frombuffer(b"".join(recorded_frames), dtype=np.int16)
-        sf.write(output_path, audio, sample_rate, subtype="PCM_16")
-
-        print(f"录音保存: {output_path}")
-        return output_path
 
     async def record_push_to_talk(self, out_path: str | None = None) -> str:
         import threading
@@ -289,12 +238,11 @@ class AudioClient:
 
         import numpy as np
         import sounddevice as sd
-        import soundfile as sf
         from pynput import keyboard
 
-        fs = 44100
+        fs = PTT_SAMPLE_RATE
         channels = 1
-        blocksize = 1024
+        blocksize = 512
         wait_press_seconds = 500.0
         max_record_seconds = 60.0
         pre_roll_ms = 500
@@ -357,7 +305,7 @@ class AudioClient:
             with sd.InputStream(
                 samplerate=fs,
                 channels=channels,
-                dtype="float32",
+                dtype="int16",
                 device=None,
                 blocksize=blocksize,
                 callback=callback,
@@ -383,6 +331,13 @@ class AudioClient:
             raise RuntimeError("没有录到音频，请重试。")
 
         audio = np.concatenate(frames, axis=0)
-        sf.write(tmp, audio, fs)
+        write_speech_wav(tmp, audio, fs)
         print(f"录音保存: {tmp}")
         return tmp
+
+
+def write_speech_wav(path: str, audio: Any, sample_rate: int = PTT_SAMPLE_RATE) -> None:
+    """把语音写成单声道 PCM16 WAV（识别用的统一格式）。"""
+    import soundfile as sf
+
+    sf.write(path, audio, sample_rate, subtype="PCM_16")

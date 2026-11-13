@@ -7,7 +7,7 @@ from pc.vision.vision_system import VisionSystem
 camera = CameraStream(camera_index=0)
 frame = camera.read()
 
-calibrator = MapCalibrator(project_root_path / "pc" / "vision" / "map_config.yaml")
+calibrator = MapCalibrator(project_root_path / "pc" / "field" / "data" / "wro_field.yaml")
 result = calibrator.calibrate(frame)
 
 print(result)

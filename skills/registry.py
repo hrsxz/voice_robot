@@ -20,6 +20,7 @@ class ActionRule:
     allowed: tuple[Any, ...] = ()
     min_value: int | float | None = None
     max_value: int | float | None = None
+    description: str | None = None  # 一句话说明 (realtime 链路的工具描述用)
 
     @classmethod
     def from_mapping(
@@ -28,7 +29,7 @@ class ActionRule:
         skill_id: str,
         runtime: str | None,
         data: dict[str, Any],
-    ) -> "ActionRule":
+    ) -> ActionRule:
         # 把 frontmatter 里某个 action 的配置字典转换成 ActionRule 实例。
         return cls(
             action=action,
@@ -40,6 +41,7 @@ class ActionRule:
             allowed=tuple(data.get("allowed") or ()),
             min_value=data.get("min"),
             max_value=data.get("max"),
+            description=data.get("description"),
         )
 
 
@@ -80,6 +82,17 @@ def load_skill_registry(skills_dir: Path | None = None) -> SkillRegistry:
             )
 
     return SkillRegistry(actions=actions)
+
+
+def load_skill_frontmatters(skills_dir: Path | None = None) -> dict[str, dict[str, Any]]:
+    """按 skill id 返回每个 skills/*.skill.md 的 frontmatter。"""
+    skills_path = skills_dir or constants.project_root_path / "skills"
+    result: dict[str, dict[str, Any]] = {}
+    for skill_file in sorted(skills_path.glob("*.skill.md")):
+        frontmatter = _load_frontmatter(skill_file)
+        if frontmatter:
+            result[str(frontmatter.get("id") or skill_file.stem)] = frontmatter
+    return result
 
 
 def get_action_rule(action: str, skills_dir: Path | None = None) -> ActionRule | None:

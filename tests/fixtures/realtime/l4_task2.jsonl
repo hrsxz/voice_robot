@@ -1,0 +1,62 @@
+{"type": "session.created", "t_ms": 58}
+{"type": "session.updated", "t_ms": 221}
+{"type": "input_audio_buffer.committed", "item_id": "item_Ejt2kroZLjldzxxtX8T4w", "t_ms": 664}
+{"type": "conversation.item.added", "t_ms": 665}
+{"type": "conversation.item.done", "t_ms": 670}
+{"type": "response.created", "response": {"id": "resp_Ejt2koGK0FxAsIvYBRASx", "status": "in_progress"}, "t_ms": 674}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_Ejt2kroZLjldzxxtX8T4w", "delta": "完成", "t_ms": 787}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_Ejt2kroZLjldzxxtX8T4w", "delta": "任务", "t_ms": 788}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_Ejt2kroZLjldzxxtX8T4w", "delta": "二", "t_ms": 788}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_Ejt2kroZLjldzxxtX8T4w", "delta": "。", "t_ms": 788}
+{"type": "response.output_item.added", "response_id": "resp_Ejt2koGK0FxAsIvYBRASx", "output_index": 0, "t_ms": 788}
+{"type": "conversation.item.added", "t_ms": 792}
+{"type": "response.function_call_arguments.delta", "item_id": "item_Ejt2kY13nmfQFVy3yd9za", "call_id": "call_fUnRDYWwz99kFUEs", "delta": "{", "response_id": "resp_Ejt2koGK0FxAsIvYBRASx", "output_index": 0, "t_ms": 792}
+{"type": "response.function_call_arguments.delta", "item_id": "item_Ejt2kY13nmfQFVy3yd9za", "call_id": "call_fUnRDYWwz99kFUEs", "delta": "  \n", "response_id": "resp_Ejt2koGK0FxAsIvYBRASx", "output_index": 0, "t_ms": 793}
+{"type": "response.function_call_arguments.delta", "item_id": "item_Ejt2kY13nmfQFVy3yd9za", "call_id": "call_fUnRDYWwz99kFUEs", "delta": " ", "response_id": "resp_Ejt2koGK0FxAsIvYBRASx", "output_index": 0, "t_ms": 793}
+{"type": "response.function_call_arguments.delta", "item_id": "item_Ejt2kY13nmfQFVy3yd9za", "call_id": "call_fUnRDYWwz99kFUEs", "delta": " \"", "response_id": "resp_Ejt2koGK0FxAsIvYBRASx", "output_index": 0, "t_ms": 793}
+{"type": "response.function_call_arguments.delta", "item_id": "item_Ejt2kY13nmfQFVy3yd9za", "call_id": "call_fUnRDYWwz99kFUEs", "delta": "goal", "response_id": "resp_Ejt2koGK0FxAsIvYBRASx", "output_index": 0, "t_ms": 793}
+{"type": "response.function_call_arguments.delta", "item_id": "item_Ejt2kY13nmfQFVy3yd9za", "call_id": "call_fUnRDYWwz99kFUEs", "delta": "\":", "response_id": "resp_Ejt2koGK0FxAsIvYBRASx", "output_index": 0, "t_ms": 793}
+{"type": "response.function_call_arguments.delta", "item_id": "item_Ejt2kY13nmfQFVy3yd9za", "call_id": "call_fUnRDYWwz99kFUEs", "delta": " \"", "response_id": "resp_Ejt2koGK0FxAsIvYBRASx", "output_index": 0, "t_ms": 793}
+{"type": "response.function_call_arguments.delta", "item_id": "item_Ejt2kY13nmfQFVy3yd9za", "call_id": "call_fUnRDYWwz99kFUEs", "delta": "完成", "response_id": "resp_Ejt2koGK0FxAsIvYBRASx", "output_index": 0, "t_ms": 793}
+{"type": "response.function_call_arguments.delta", "item_id": "item_Ejt2kY13nmfQFVy3yd9za", "call_id": "call_fUnRDYWwz99kFUEs", "delta": "任务", "response_id": "resp_Ejt2koGK0FxAsIvYBRASx", "output_index": 0, "t_ms": 853}
+{"type": "response.function_call_arguments.delta", "item_id": "item_Ejt2kY13nmfQFVy3yd9za", "call_id": "call_fUnRDYWwz99kFUEs", "delta": "2", "response_id": "resp_Ejt2koGK0FxAsIvYBRASx", "output_index": 0, "t_ms": 853}
+{"type": "response.function_call_arguments.delta", "item_id": "item_Ejt2kY13nmfQFVy3yd9za", "call_id": "call_fUnRDYWwz99kFUEs", "delta": "\"\n", "response_id": "resp_Ejt2koGK0FxAsIvYBRASx", "output_index": 0, "t_ms": 853}
+{"type": "response.function_call_arguments.delta", "item_id": "item_Ejt2kY13nmfQFVy3yd9za", "call_id": "call_fUnRDYWwz99kFUEs", "delta": "}", "response_id": "resp_Ejt2koGK0FxAsIvYBRASx", "output_index": 0, "t_ms": 853}
+{"type": "response.function_call_arguments.done", "item_id": "item_Ejt2kY13nmfQFVy3yd9za", "call_id": "call_fUnRDYWwz99kFUEs", "name": "run_task", "arguments": "{  \n  \"goal\": \"完成任务2\"\n}", "response_id": "resp_Ejt2koGK0FxAsIvYBRASx", "output_index": 0, "t_ms": 854}
+{"type": "conversation.item.done", "t_ms": 854}
+{"type": "response.output_item.done", "response_id": "resp_Ejt2koGK0FxAsIvYBRASx", "output_index": 0, "t_ms": 854}
+{"type": "response.done", "response": {"id": "resp_Ejt2koGK0FxAsIvYBRASx", "status": "completed", "output": [{"type": "function_call", "name": "run_task", "arguments": "{  \n  \"goal\": \"完成任务2\"\n}", "call_id": "call_fUnRDYWwz99kFUEs"}], "usage": {"input_token_details": {"audio_tokens": 22, "cached_tokens": 0, "cached_tokens_details": {"audio_tokens": 0, "image_tokens": 0, "text_tokens": 0}, "image_tokens": 0, "text_tokens": 1270}, "input_tokens": 1292, "output_token_details": {"audio_tokens": 0, "text_tokens": 22}, "output_tokens": 22, "total_tokens": 1314}}, "t_ms": 858}
+{"type": "rate_limits.updated", "t_ms": 977}
+{"type": "conversation.item.input_audio_transcription.completed", "item_id": "item_Ejt2kroZLjldzxxtX8T4w", "transcript": "完成任务二。", "t_ms": 977}
+{"type": "conversation.item.added", "t_ms": 1182}
+{"type": "conversation.item.done", "t_ms": 1182}
+{"type": "response.created", "response": {"id": "resp_Ejt2ldshezS4qN4G0wE2j", "status": "in_progress"}, "t_ms": 1266}
+{"type": "response.output_item.added", "response_id": "resp_Ejt2ldshezS4qN4G0wE2j", "output_index": 0, "t_ms": 1469}
+{"type": "conversation.item.added", "t_ms": 1470}
+{"type": "response.content_part.added", "item_id": "item_Ejt2lWKp8uJoxxs88wmJX", "response_id": "resp_Ejt2ldshezS4qN4G0wE2j", "output_index": 0, "t_ms": 1470}
+{"type": "response.output_text.delta", "item_id": "item_Ejt2lWKp8uJoxxs88wmJX", "delta": "明", "response_id": "resp_Ejt2ldshezS4qN4G0wE2j", "output_index": 0, "t_ms": 1471}
+{"type": "response.output_text.delta", "item_id": "item_Ejt2lWKp8uJoxxs88wmJX", "delta": "白", "response_id": "resp_Ejt2ldshezS4qN4G0wE2j", "output_index": 0, "t_ms": 1471}
+{"type": "response.output_text.delta", "item_id": "item_Ejt2lWKp8uJoxxs88wmJX", "delta": "，我", "response_id": "resp_Ejt2ldshezS4qN4G0wE2j", "output_index": 0, "t_ms": 1471}
+{"type": "response.output_text.delta", "item_id": "item_Ejt2lWKp8uJoxxs88wmJX", "delta": "已经", "response_id": "resp_Ejt2ldshezS4qN4G0wE2j", "output_index": 0, "t_ms": 1471}
+{"type": "response.output_text.delta", "item_id": "item_Ejt2lWKp8uJoxxs88wmJX", "delta": "将", "response_id": "resp_Ejt2ldshezS4qN4G0wE2j", "output_index": 0, "t_ms": 1471}
+{"type": "response.output_text.delta", "item_id": "item_Ejt2lWKp8uJoxxs88wmJX", "delta": "任务", "response_id": "resp_Ejt2ldshezS4qN4G0wE2j", "output_index": 0, "t_ms": 1472}
+{"type": "response.output_text.delta", "item_id": "item_Ejt2lWKp8uJoxxs88wmJX", "delta": "2", "response_id": "resp_Ejt2ldshezS4qN4G0wE2j", "output_index": 0, "t_ms": 1472}
+{"type": "response.output_text.delta", "item_id": "item_Ejt2lWKp8uJoxxs88wmJX", "delta": "提交", "response_id": "resp_Ejt2ldshezS4qN4G0wE2j", "output_index": 0, "t_ms": 1472}
+{"type": "response.output_text.delta", "item_id": "item_Ejt2lWKp8uJoxxs88wmJX", "delta": "给", "response_id": "resp_Ejt2ldshezS4qN4G0wE2j", "output_index": 0, "t_ms": 1472}
+{"type": "response.output_text.delta", "item_id": "item_Ejt2lWKp8uJoxxs88wmJX", "delta": "系统", "response_id": "resp_Ejt2ldshezS4qN4G0wE2j", "output_index": 0, "t_ms": 1472}
+{"type": "response.output_text.delta", "item_id": "item_Ejt2lWKp8uJoxxs88wmJX", "delta": "了", "response_id": "resp_Ejt2ldshezS4qN4G0wE2j", "output_index": 0, "t_ms": 1472}
+{"type": "response.output_text.delta", "item_id": "item_Ejt2lWKp8uJoxxs88wmJX", "delta": "。", "response_id": "resp_Ejt2ldshezS4qN4G0wE2j", "output_index": 0, "t_ms": 1472}
+{"type": "response.output_text.delta", "item_id": "item_Ejt2lWKp8uJoxxs88wmJX", "delta": "请", "response_id": "resp_Ejt2ldshezS4qN4G0wE2j", "output_index": 0, "t_ms": 1472}
+{"type": "response.output_text.delta", "item_id": "item_Ejt2lWKp8uJoxxs88wmJX", "delta": "稍", "response_id": "resp_Ejt2ldshezS4qN4G0wE2j", "output_index": 0, "t_ms": 1472}
+{"type": "response.output_text.delta", "item_id": "item_Ejt2lWKp8uJoxxs88wmJX", "delta": "等", "response_id": "resp_Ejt2ldshezS4qN4G0wE2j", "output_index": 0, "t_ms": 1472}
+{"type": "response.output_text.delta", "item_id": "item_Ejt2lWKp8uJoxxs88wmJX", "delta": "片", "response_id": "resp_Ejt2ldshezS4qN4G0wE2j", "output_index": 0, "t_ms": 1473}
+{"type": "response.output_text.delta", "item_id": "item_Ejt2lWKp8uJoxxs88wmJX", "delta": "刻", "response_id": "resp_Ejt2ldshezS4qN4G0wE2j", "output_index": 0, "t_ms": 1477}
+{"type": "response.output_text.delta", "item_id": "item_Ejt2lWKp8uJoxxs88wmJX", "delta": "，", "response_id": "resp_Ejt2ldshezS4qN4G0wE2j", "output_index": 0, "t_ms": 1480}
+{"type": "response.output_text.delta", "item_id": "item_Ejt2lWKp8uJoxxs88wmJX", "delta": "看看", "response_id": "resp_Ejt2ldshezS4qN4G0wE2j", "output_index": 0, "t_ms": 1592}
+{"type": "response.output_text.delta", "item_id": "item_Ejt2lWKp8uJoxxs88wmJX", "delta": "结果", "response_id": "resp_Ejt2ldshezS4qN4G0wE2j", "output_index": 0, "t_ms": 1592}
+{"type": "response.output_text.delta", "item_id": "item_Ejt2lWKp8uJoxxs88wmJX", "delta": "。", "response_id": "resp_Ejt2ldshezS4qN4G0wE2j", "output_index": 0, "t_ms": 1593}
+{"type": "response.output_text.done", "item_id": "item_Ejt2lWKp8uJoxxs88wmJX", "response_id": "resp_Ejt2ldshezS4qN4G0wE2j", "output_index": 0, "t_ms": 1593}
+{"type": "response.content_part.done", "item_id": "item_Ejt2lWKp8uJoxxs88wmJX", "response_id": "resp_Ejt2ldshezS4qN4G0wE2j", "output_index": 0, "t_ms": 1593}
+{"type": "conversation.item.done", "t_ms": 1594}
+{"type": "response.output_item.done", "response_id": "resp_Ejt2ldshezS4qN4G0wE2j", "output_index": 0, "t_ms": 1594}
+{"type": "response.done", "response": {"id": "resp_Ejt2ldshezS4qN4G0wE2j", "status": "completed", "output": [{"type": "message", "text": "明白，我已经将任务2提交给系统了。请稍等片刻，看看结果。"}], "usage": {"input_token_details": {"audio_tokens": 22, "cached_tokens": 1280, "cached_tokens_details": {"audio_tokens": 0, "image_tokens": 0, "text_tokens": 1280}, "image_tokens": 0, "text_tokens": 1297}, "input_tokens": 1319, "output_token_details": {"audio_tokens": 0, "text_tokens": 23}, "output_tokens": 23, "total_tokens": 1342}}, "t_ms": 1594}

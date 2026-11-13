@@ -66,7 +66,7 @@ class MapCalibrator:
         image_array = np.array(image_points, dtype=np.float32)
         map_array = np.array(map_points, dtype=np.float32)
 
-        homography, mask = cv2.findHomography(image_array, map_array, cv2.RANSAC)
+        homography, _mask = cv2.findHomography(image_array, map_array, cv2.RANSAC)
         if homography is None:
             self.homography = None
             self.inverse_homography = None

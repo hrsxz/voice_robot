@@ -1,0 +1,72 @@
+# WRO Starter 任务组 (改动 task-layer 设计 D5)。
+#
+# 一份规则 = 任务 1–5: 每个任务包含哪些物体、各自送到哪里 (规则目标)。
+# 物体编号和目标写法同 pc/field/data/wro_field.yaml: zone:<A-D> / circle:<颜色> / start。
+# 没有出现在任何任务里的物体, 规则目标沿用场地模型物体目录里的默认目标。
+#
+# 当前使用 wro2025 (default)。注意: wro2025 按项目原计划的说法整理, 还没有对照 2025 年的任务书:
+#   任务 1 三个小人送回同色区域 (黄→A、绿→B、红→D), 任务 2 蓝色大人→B,
+#   任务 4 服务机器人→同色圆圈, 任务 5 停车; 任务 3 原计划没写, 暂按 2022 年 (包裹→D 区)。
+# 有了 2025 年任务书 (放进 docs/WRO/) 后核对这一份即可, 代码不用改。
+# starter2022 按 docs/WRO/WRO2022-ST-Aufgaben.pdf: 所有人都送到 B 区。
+
+default: wro2025
+
+rulesets:
+  wro2025:
+    title: WRO Starter 2025（按原计划整理，待对照任务书）
+    missions:
+      1:
+        names: {zh: [送小人回家, 小人回家, 送小人], de: [Personen nach Hause]}
+        items:
+          yellow_person: zone:A
+          green_person: zone:B
+          red_person: zone:D
+      2:
+        names: {zh: [送大人, 蓝色大人], de: [Große Person]}
+        items:
+          blue_person: zone:B
+      3:
+        names: {zh: [送包裹, 包裹], de: [Pakete]}
+        items:
+          package_1: zone:D
+          package_2: zone:D
+      4:
+        names: {zh: [送服务机器人, 服务机器人回圆圈], de: [Serviceroboter]}
+        items:
+          green_robot: circle:green
+          red_robot: circle:red
+          blue_robot: circle:blue
+          yellow_robot: circle:yellow
+      5:
+        names: {zh: [停车, 回起终点区, 回家停车], de: [Parken, Zurück zum Start]}
+        park: true
+
+  starter2022:
+    title: WRO Starter 2022（docs/WRO/WRO2022-ST-Aufgaben.pdf）
+    missions:
+      1:
+        names: {zh: [送小人, 小人], de: [Personen]}
+        items:
+          yellow_person: zone:B
+          green_person: zone:B
+          red_person: zone:B
+      2:
+        names: {zh: [送大人, 蓝色大人], de: [Große Person]}
+        items:
+          blue_person: zone:B
+      3:
+        names: {zh: [送包裹, 包裹], de: [Pakete]}
+        items:
+          package_1: zone:D
+          package_2: zone:D
+      4:
+        names: {zh: [送服务机器人], de: [Serviceroboter]}
+        items:
+          green_robot: circle:green
+          red_robot: circle:red
+          blue_robot: circle:blue
+          yellow_robot: circle:yellow
+      5:
+        names: {zh: [停车, 回起终点区], de: [Parken]}
+        park: true

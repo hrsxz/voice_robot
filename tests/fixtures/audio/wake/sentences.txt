@@ -1,0 +1,10 @@
+wake_only	小蓝小蓝
+wake_hello	你好小蓝
+wake_forward_30	小蓝小蓝，前进三十厘米
+wake_forward_30_fast	小蓝小蓝前进三十厘米
+wake_in_middle	嗯那个，我想想，小蓝小蓝，向左转九十度
+wake_stop	急停
+chat_lunch	今天天气真不错，我们中午去吃面条吧
+chat_homework	小明你好，你的作业写完了吗，快去写作业
+chat_blue	把蓝色的积木放到桌子上，然后去洗手
+chat_long	昨天我们去公园玩了，那里有很多小朋友在放风筝，还有人在湖边钓鱼，我们一直玩到天黑才回家
