@@ -22,26 +22,47 @@ dependencies = [
     "soundfile>=0.14.0",
     "truststore>=0.10.4",
     "webrtcvad-wheels>=2.0.14",
+    "websockets>=13",
 ]
 
 [dependency-groups]
 dev = [
-    "pylint>=4.0.6",
-    "flake8-pyproject>=1.2.4",
+    "ruff>=0.17.5",
     "types-PyYAML>=6.0.12.20250915",
 ]
 
-[tool.flake8]
-max-line-length = 100
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["*.ipynb"]
 
-[tool.pylint."messages control"]
-disable = [
-    "C0114", # missing-module-docstring
-    "C0115", # missing-class-docstring
-    "C0116", # missing-function-docstring
-    "W1203", # logging-fstring-interpolation
-    "W1202", # logging-not-lazy
-    "E0611", # no-name-in-module
-    "W0718", # broad-exception-caught
-    "W0105", # string statement has no effect
+[tool.ruff.lint]
+select = [
+    "E", "W",  # pycodestyle
+    "F",       # pyflakes
+    "I",       # import 排序 (编辑器保存时自动整理)
+    "UP",      # 新版 Python 写法
+    "B",       # 常见 bug
+    "SIM",     # 可以简化的写法
+    "RUF",     # ruff 自己的规则
+    "PLE", "PLW",  # pylint 的错误和警告
+    "ASYNC",   # asyncio 里的阻塞调用等
 ]
+ignore = [
+    "RUF001", "RUF002", "RUF003",  # 中文全角标点 (，：（）) 是有意的
+    "SIM105",   # try/except/pass 比 contextlib.suppress 更直观
+    "SIM108",   # 不强制把 if/else 改成三元表达式
+    "ASYNC230", "ASYNC240",  # async 函数里少量的本地文件操作 (删临时 WAV 等) 是可以接受的
+    "ASYNC109", # async 函数带 timeout 参数是有意的设计
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Hub 上运行的 Pybricks (MicroPython) 程序: 保持 MicroPython 友好的写法
+"spike_hub/*" = ["UP", "SIM"]
+# 手动测试脚本, 在 async 函数里用 input() 是有意的
+"**/PC_test.py" = ["ASYNC250"]
+# 本地 Whisper 模型按需加载, 缓存在模块级变量里
+"pc/speech/whisper_stt.py" = ["PLW0603"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["pc", "skills", "scripts", "tests"]

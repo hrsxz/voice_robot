@@ -77,9 +77,9 @@ class client_chatGPT:
                         我期望你不仅给出答案，还要解释推导过程和逻辑。
                     """,
                 },
-            ]
-            + script
-            + self.user_message(base64_image),
+                *script,
+                *self.user_message(base64_image),
+            ],
             max_tokens=1000,
         )
         response_text = response.choices[0].message.content
@@ -91,7 +91,7 @@ class client_chatGPT:
             try:
                 with open(image_path, "rb") as image_file:
                     return base64.b64encode(image_file.read()).decode("utf-8")
-            except IOError as e:
+            except OSError as e:
                 if e.errno != errno.EACCES:
                     # Not a "file in use" error, re-raise
                     raise

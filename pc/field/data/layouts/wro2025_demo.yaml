@@ -1,0 +1,24 @@
+# 任务层演示布局 (改动 task-layer): 配合 missions.yaml 的 wro2025 规则 (小人送回同色区域)。
+# 不是 2025 年任务书的摆法 (还没有任务书), 只是在 starter2022 的位置上把黄色、绿色小人对调:
+# starter2022 里黄色小人就在 A 区旁边、绿色小人就在 B 区旁边, 按 2025 规则开局就算"已送达",
+# 演示不出"送回家"。有了任务书后按任务书再加一份布局。
+name: wro2025_demo
+
+objects:
+  yellow_person: b_side     # B 区下方 (要送回 A 区)
+  green_person: a_side      # A 区右边 (要送回 B 区)
+  blue_person: c_inner      # C 区里
+  red_person: d_left        # D 区左边
+  package_1: pos2           # 左边 2、3 号位
+  package_2: pos3
+  green_robot: d1           # D 区上方 6 格里的 4 格 (第 2、5 格是树)
+  red_robot: d3
+  blue_robot: d4
+  yellow_robot: d6
+
+obstacles:
+  tree_1: {type: tree, at: pos1, radius_cm: 3.5}
+  tree_2: {type: tree, at: pos4, radius_cm: 3.5}
+  tree_3: {type: tree, at: d2, radius_cm: 3.5}
+  tree_4: {type: tree, at: d5, radius_cm: 3.5}
+  barrier: {type: barrier, polygon: [[42.2, 31.6], [44.8, 31.6], [44.8, 64.4], [42.2, 64.4]]}

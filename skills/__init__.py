@@ -1,10 +1,17 @@
-from .registry import (ActionRule, SkillRegistry, get_action_rule,
-                       list_actions, load_skill_registry)
+from .registry import (
+                       ActionRule,
+                       SkillRegistry,
+                       get_action_rule,
+                       list_actions,
+                       load_skill_frontmatters,
+                       load_skill_registry,
+)
 
 __all__ = [
     "ActionRule",
     "SkillRegistry",
     "get_action_rule",
     "list_actions",
+    "load_skill_frontmatters",
     "load_skill_registry",
 ]

@@ -18,8 +18,10 @@ def normalize_text(text: str) -> str:
         return ''
     # 统一空格、全角数字和全角标点，便于后续规则匹配
     normalized = _to_half_width(str(text).strip()).lower()
-    # 去掉大部分符号，但保留中文、英文、数字和空白
-    normalized = re.sub(r"[^\w\s\u4e00-\u9fff]+", ' ', normalized)
+    # 去掉大部分符号，但保留中文、英文、数字和空白；
+    # 角度符号（90°）和数字之间的小数点（1.5 米）也要保留，否则数值会被读错
+    normalized = re.sub(r"[^\w\s一-鿿°.]+", ' ', normalized)
+    normalized = re.sub(r"(?<!\d)\.|\.(?!\d)", ' ', normalized)
     # 把连续空白压缩成一个空格，避免分词和正则提取受干扰
     normalized = re.sub(r"\s+", ' ', normalized)
 

@@ -20,11 +20,8 @@ input_schema:
         - stop
         - forward
         - backward
-        - straightforward
-        - straightbackward
         - left
         - right
-        - face_to
         - gripper_up
         - gripper_down
         - gripper_pos
@@ -55,8 +52,7 @@ input_schema:
     - if:
         properties:
           action:
-            enum: [forward, backward, straightforward, straightbackward,
-                   line_follow_left, line_follow_right]
+            enum: [forward, backward, line_follow_left, line_follow_right]
       then:
         properties:
           args:
@@ -64,7 +60,7 @@ input_schema:
     - if:
         properties:
           action:
-            enum: [left, right, face_to, gripper_pos,
+            enum: [left, right, gripper_pos,
                    gripper_left_pos, gripper_right_pos]
       then:
         properties:
@@ -90,69 +86,62 @@ output_schema:
 action_rules:
   stop:
     route: move
+    description: "立即停止所有运动"
     value_type: none
   forward:
     route: move
+    description: "向前直行，distance_cm 是距离（厘米）"
     value_type: int
     arg_key: distance_cm
     min: 0
     max: 10000
   backward:
     route: move
-    value_type: int
-    arg_key: distance_cm
-    min: 0
-    max: 10000
-  straightforward:
-    route: move
-    value_type: int
-    arg_key: distance_cm
-    min: 0
-    max: 10000
-  straightbackward:
-    route: move
+    description: "向后直行，distance_cm 是距离（厘米）"
     value_type: int
     arg_key: distance_cm
     min: 0
     max: 10000
   left:
     route: move
+    description: "原地左转，angle_deg 是角度（度）"
     value_type: int
     arg_key: angle_deg
     min: 0
     max: 360
   right:
     route: move
-    value_type: int
-    arg_key: angle_deg
-    min: 0
-    max: 360
-  face_to:
-    route: move
+    description: "原地右转，angle_deg 是角度（度）"
     value_type: int
     arg_key: angle_deg
     min: 0
     max: 360
   gripper_up:
     route: move
+    description: "两个夹爪（夹子）一起抬起；只说了左边或右边时不要用这个"
     value_type: none
   gripper_down:
     route: move
+    description: "两个夹爪（夹子）一起放下；只说了左边或右边时不要用这个"
     value_type: none
   gripper_pos:
     route: move
+    description: "两个夹爪（夹子）一起转到指定角度，0 是放下，90 是抬起"
     value_type: int
     arg_key: angle_deg
     min: 0
-    max: 360
+    max: 90
   gripper_left_up:
     route: move
+    description: "只抬起左边的夹爪（左夹子）"
     value_type: none
   gripper_left_down:
     route: move
+    description: "只放下左边的夹爪（左夹子）"
     value_type: none
   gripper_left_pos:
     route: move
+    description: "左边的夹爪（左夹子）转到指定角度，0 是放下，90 是抬起"
     value_type: int
     arg_key: angle_deg
     min: 0
@@ -160,12 +149,15 @@ action_rules:
 
   gripper_right_up:
     route: move
+    description: "只抬起右边的夹爪（右夹子）"
     value_type: none
   gripper_right_down:
     route: move
+    description: "只放下右边的夹爪（右夹子）"
     value_type: none
   gripper_right_pos:
     route: move
+    description: "右边的夹爪（右夹子）转到指定角度，0 是放下，90 是抬起"
     value_type: int
     arg_key: angle_deg
     min: 0
@@ -173,12 +165,14 @@ action_rules:
 
   line_follow_left:
     route: move
+    description: "沿黑线巡线前进（用左侧边缘），distance_cm 是距离（厘米）"
     value_type: int
     arg_key: distance_cm
     min: 1
     max: 10000
   line_follow_right:
     route: move
+    description: "沿黑线巡线前进（用右侧边缘），distance_cm 是距离（厘米）"
     value_type: int
     arg_key: distance_cm
     min: 1
@@ -236,7 +230,6 @@ NL 示例:
 - "向前走 30 厘米" -> {"action":"forward","args":{"distance_cm":30}}
 - "后退 20 厘米" -> {"action":"backward","args":{"distance_cm":20}}
 - "右转 45 度" -> {"action":"right","args":{"angle_deg":45}}
-- "朝 120 度方向" -> {"action":"face_to","args":{"angle_deg":120}}
 - "夹爪到 60 度" -> {"action":"gripper_pos","args":{"angle_deg":60}}
 - "停止" -> {"action":"stop","args":{}}
 
@@ -254,9 +247,11 @@ res = await move_tools.execute({"hub": hub, "action": "forward", "value": 30})
 输入说明:
 
 - `action`: 见 schema 枚举。
-- `args.distance_cm`: 仅用于 `forward/backward/straightforward/straightbackward`。
-- `args.angle_deg`: 仅用于 `left/right/face_to/gripper_pos`。
-- `stop/gripper_up/gripper_down` 不需要参数，使用空对象 `args: {}`。
+- `args.distance_cm`: 用于 `forward/backward/line_follow_left/line_follow_right`。
+- `args.angle_deg`: 用于 `left/right`（0–360），以及 `gripper_pos/gripper_left_pos/gripper_right_pos`（0–90）。
+- `stop/gripper_up/gripper_down` 等不需要参数，使用空对象 `args: {}`。
+- 这里声明的每个动作，Hub 程序（`spike_hub/control_by_llm.py`）都必须能执行，由一致性测试保证。
+  按绝对朝向转向（原来的 `face_to`）以后由导航模块用视觉朝向实现。
 
 输出说明:
 

@@ -2,10 +2,51 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: voice_to_command",
+            "name": "voice_to_robot: 按空格 (ptt, 模拟 Hub)",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/pc/voice_to_command.py",
+            "module": "pc.voice_to_robot",
+            "args": ["--input", "ptt", "--hub", "sim"],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "justMyCode": true
+        },
+        {
+            "name": "voice_to_robot: 唤醒词 (wake, 模拟 Hub)",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pc.voice_to_robot",
+            "args": ["--input", "wake", "--hub", "sim"],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "justMyCode": true
+        },
+        {
+            "name": "voice_to_robot: 键盘 (cli, 模拟 Hub)",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pc.voice_to_robot",
+            "args": ["--input", "cli", "--hub", "sim"],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "justMyCode": true
+        },
+        {
+            "name": "voice_to_robot: 按空格 + realtime (模拟 Hub)",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pc.voice_to_robot",
+            "args": ["--input", "ptt", "--pipeline", "realtime", "--hub", "sim"],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "justMyCode": true
+        },
+        {
+            "name": "voice_to_robot: 唤醒词 + realtime (模拟 Hub)",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pc.voice_to_robot",
+            "args": ["--input", "wake", "--pipeline", "realtime", "--hub", "sim"],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
             "justMyCode": true

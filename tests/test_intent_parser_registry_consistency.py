@@ -1,9 +1,9 @@
-# pylint: disable=protected-access
 
 import unittest
 from typing import ClassVar
 
-from pc.llm import intent_parser
+from pc.llm import command_matcher, intent_parser
+from pc.utils.utils import normalize_text
 from skills import SkillRegistry, load_skill_registry
 
 
@@ -52,56 +52,58 @@ class IntentParserRegistryConsistencyTest(unittest.TestCase):
             },
         )
 
-    def test_fallback_steps_actions_exist_in_registry(self) -> None:
-        text = "向前 30cm，然后左转90度，然后停止，然后 gripper up"
+    def test_non_json_output_is_not_guessed(self) -> None:
+        # 不再按关键词猜动作 (原 _fallback_steps_from_text), 非 JSON 输出得到空结果
+        for text in ("向前 30cm，然后左转90度", "forward 30, left 45", "", "好的"):
+            with self.subTest(text=text):
+                self.assertEqual(intent_parser.parse_intent(text), {"steps": []})
 
-        steps = intent_parser._fallback_steps_from_text(text)
+    def test_json_without_action_or_steps_gives_empty_result(self) -> None:
+        self.assertEqual(intent_parser.parse_intent('{"foo": 1}'), {"steps": []})
 
+    def test_ndjson_lines_are_parsed(self) -> None:
+        text = "\n".join([
+            '{"action":"forward","args":{"distance_cm":30}}',
+            "这一行不是 JSON",
+            '{"action":"left","args":{"angle_deg":90}}',
+        ])
         self.assertEqual(
-            steps,
-            [
+            intent_parser.parse_intent(text),
+            {"steps": [
                 {"action": "forward", "args": {"distance_cm": 30}},
                 {"action": "left", "args": {"angle_deg": 90}},
-                {"action": "stop", "args": {}},
-                {"action": "gripper_up", "args": {}},
-            ],
+            ]},
         )
-        for step in steps:
-            with self.subTest(step=step):
-                self.assertIn(step["action"], self.registry.actions)
-                self.assertEqual(step["args"], self._expected_args_for_fallback(step))
 
-    def test_fallback_step_args_match_registry_rules(self) -> None:
+    def test_unknown_action_line_is_kept_for_rejection(self) -> None:
+        # 不认识的动作不静默丢掉, 交给 RobotAgent 拒绝并记录原因
+        self.assertEqual(
+            intent_parser.parse_line('{"action":"dance","args":{}}'),
+            [{"action": "dance", "args": {}}],
+        )
+
+    def test_fast_path_commands_match_registry_rules(self) -> None:
+        # 快速通道生成的命令必须能通过同一套 registry 规则校验
         cases = [
-            ("forward 2m", {"action": "forward", "args": {"distance_cm": 200}}),
-            ("backward 45cm", {"action": "backward", "args": {"distance_cm": 45}}),
-            ("left 90度", {"action": "left", "args": {"angle_deg": 90}}),
-            ("right 45deg", {"action": "right", "args": {"angle_deg": 45}}),
-            ("stop", {"action": "stop", "args": {}}),
-            ("gripper down", {"action": "gripper_down", "args": {}}),
-            ("gripper pos 30", {"action": "gripper_pos", "args": {"angle_deg": 30}}),
+            "forward 2m", "backward 45cm", "left 90度", "right 45deg", "stop",
+            "gripper down", "gripper pos 30", "左夹爪转到60度", "沿左侧巡线50厘米",
         ]
-
-        for text, expected in cases:
-            with self.subTest(text=text):
-                steps = intent_parser._fallback_steps_from_text(text)
-                self.assertEqual(steps, [expected])
-                self.assertEqual(steps[0]["args"], self._expected_args_for_fallback(steps[0]))
-
-    def test_fallback_only_emits_registry_arg_keys(self) -> None:
-        text = "forward 30, left 45, stop, gripper down"
-
-        steps = intent_parser._fallback_steps_from_text(text)
-
-        for step in steps:
-            with self.subTest(step=step):
-                rule = self.registry.get_action_rule(step["action"])
-                self.assertIsNotNone(rule)
-                assert rule is not None
-                if rule.value_type == "none":
-                    self.assertEqual(step["args"], {})
-                else:
-                    self.assertEqual(list(step["args"].keys()), [rule.arg_key])
+        for text in cases:
+            result = command_matcher.match(normalize_text(text))
+            self.assertIsNotNone(result, text)
+            assert result is not None
+            for cmd in result.commands:
+                with self.subTest(text=text, cmd=cmd):
+                    parts = cmd.split()
+                    rule = self.registry.get_action_rule(parts[0])
+                    self.assertIsNotNone(rule)
+                    assert rule is not None
+                    if rule.value_type == "none":
+                        self.assertEqual(len(parts), 1)
+                    else:
+                        value = int(parts[1])
+                        self.assertGreaterEqual(value, rule.min_value)
+                        self.assertLessEqual(value, rule.max_value)
 
     @staticmethod
     def _sample_args(rule) -> dict:
@@ -128,14 +130,6 @@ class IntentParserRegistryConsistencyTest(unittest.TestCase):
                 return {rule.arg_key: str(rule.allowed[0]).lower()}
             return {rule.arg_key: "sample"}
         return {}
-
-    def _expected_args_for_fallback(self, step: dict) -> dict:
-        rule = self.registry.get_action_rule(step["action"])
-        self.assertIsNotNone(rule)
-        assert rule is not None
-        if rule.value_type == "none":
-            return {}
-        return {rule.arg_key: step["args"].get(rule.arg_key)}
 
 
 if __name__ == "__main__":

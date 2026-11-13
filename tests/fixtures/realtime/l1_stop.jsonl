@@ -1,0 +1,101 @@
+{"type": "session.created", "t_ms": 7}
+{"type": "session.updated", "t_ms": 173}
+{"type": "input_audio_buffer.committed", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "t_ms": 212}
+{"type": "conversation.item.added", "t_ms": 214}
+{"type": "conversation.item.done", "t_ms": 214}
+{"type": "response.created", "response": {"id": "resp_EjlAEv9zVNllVTgE4Wsf8", "status": "in_progress"}, "t_ms": 220}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "向", "t_ms": 442}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "前", "t_ms": 451}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "走", "t_ms": 459}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "，", "t_ms": 466}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "往", "t_ms": 476}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "后", "t_ms": 481}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "退", "t_ms": 492}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "，", "t_ms": 502}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "向", "t_ms": 513}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "左", "t_ms": 516}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "转", "t_ms": 564}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "，", "t_ms": 565}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "向", "t_ms": 565}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "右", "t_ms": 565}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "转", "t_ms": 565}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "，", "t_ms": 565}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "停止", "t_ms": 583}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "，", "t_ms": 583}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "左", "t_ms": 591}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "夹", "t_ms": 597}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "子", "t_ms": 604}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "抬", "t_ms": 625}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "起来", "t_ms": 630}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "，", "t_ms": 639}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "左", "t_ms": 646}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "夹", "t_ms": 658}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "子", "t_ms": 663}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "放", "t_ms": 673}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "下来", "t_ms": 685}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "，", "t_ms": 701}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "右", "t_ms": 712}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "夹", "t_ms": 719}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "子", "t_ms": 726}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "抬", "t_ms": 744}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "起来", "t_ms": 753}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "，", "t_ms": 760}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "右", "t_ms": 767}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "夹", "t_ms": 776}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "子", "t_ms": 783}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "放", "t_ms": 791}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "下来", "t_ms": 802}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "，把", "t_ms": 812}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "夹", "t_ms": 818}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "子", "t_ms": 827}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "抬", "t_ms": 841}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "起来", "t_ms": 849}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "，把", "t_ms": 859}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "夹", "t_ms": 867}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "子", "t_ms": 874}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "放", "t_ms": 885}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "下来", "t_ms": 890}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "，", "t_ms": 900}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "厘米", "t_ms": 907}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "，", "t_ms": 913}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "度", "t_ms": 924}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "，然后", "t_ms": 931}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "，再", "t_ms": 942}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "，一", "t_ms": 946}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "共", "t_ms": 957}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "做", "t_ms": 965}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "四", "t_ms": 972}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "次", "t_ms": 982}
+{"type": "conversation.item.input_audio_transcription.delta", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "delta": "。", "t_ms": 987}
+{"type": "conversation.item.input_audio_transcription.completed", "item_id": "item_EjlAESoxbgCS5hILQIYgs", "transcript": "向前走，往后退，向左转，向右转，停止，左夹子抬起来，左夹子放下来，右夹子抬起来，右夹子放下来，把夹子抬起来，把夹子放下来，厘米，度，然后，再，一共做四次。", "t_ms": 1231}
+{"type": "response.output_item.added", "response_id": "resp_EjlAEv9zVNllVTgE4Wsf8", "output_index": 0, "t_ms": 1668}
+{"type": "conversation.item.added", "t_ms": 1669}
+{"type": "response.function_call_arguments.delta", "item_id": "item_EjlAEJ7GzFtAas0rx5pjt", "call_id": "call_REN889yA9MvggVs2", "delta": "{}", "response_id": "resp_EjlAEv9zVNllVTgE4Wsf8", "output_index": 0, "t_ms": 1672}
+{"type": "response.function_call_arguments.done", "item_id": "item_EjlAEJ7GzFtAas0rx5pjt", "call_id": "call_REN889yA9MvggVs2", "name": "stop", "arguments": "{}", "response_id": "resp_EjlAEv9zVNllVTgE4Wsf8", "output_index": 0, "t_ms": 1687}
+{"type": "conversation.item.done", "t_ms": 1687}
+{"type": "response.output_item.done", "response_id": "resp_EjlAEv9zVNllVTgE4Wsf8", "output_index": 0, "t_ms": 1689}
+{"type": "response.done", "response": {"id": "resp_EjlAEv9zVNllVTgE4Wsf8", "status": "completed", "output": [{"type": "function_call", "name": "stop", "arguments": "{}", "call_id": "call_REN889yA9MvggVs2"}], "usage": {"input_token_details": {"audio_tokens": 24, "cached_tokens": 0, "cached_tokens_details": {"audio_tokens": 0, "image_tokens": 0, "text_tokens": 0}, "image_tokens": 0, "text_tokens": 828}, "input_tokens": 852, "output_token_details": {"audio_tokens": 0, "text_tokens": 10}, "output_tokens": 10, "total_tokens": 862}}, "t_ms": 1693}
+{"type": "rate_limits.updated", "t_ms": 1701}
+{"type": "conversation.item.added", "t_ms": 1828}
+{"type": "conversation.item.done", "t_ms": 1828}
+{"type": "response.created", "response": {"id": "resp_EjlAFzXlHxesJhhPTxuMY", "status": "in_progress"}, "t_ms": 1837}
+{"type": "response.output_item.added", "response_id": "resp_EjlAFzXlHxesJhhPTxuMY", "output_index": 0, "t_ms": 2008}
+{"type": "conversation.item.added", "t_ms": 2009}
+{"type": "response.content_part.added", "item_id": "item_EjlAF7EhHPuso3IUdmnMe", "response_id": "resp_EjlAFzXlHxesJhhPTxuMY", "output_index": 0, "t_ms": 2009}
+{"type": "response.output_text.delta", "item_id": "item_EjlAF7EhHPuso3IUdmnMe", "delta": "好的", "response_id": "resp_EjlAFzXlHxesJhhPTxuMY", "output_index": 0, "t_ms": 2011}
+{"type": "response.output_text.delta", "item_id": "item_EjlAF7EhHPuso3IUdmnMe", "delta": "，我", "response_id": "resp_EjlAFzXlHxesJhhPTxuMY", "output_index": 0, "t_ms": 2070}
+{"type": "response.output_text.delta", "item_id": "item_EjlAF7EhHPuso3IUdmnMe", "delta": "已经", "response_id": "resp_EjlAFzXlHxesJhhPTxuMY", "output_index": 0, "t_ms": 2073}
+{"type": "response.output_text.delta", "item_id": "item_EjlAF7EhHPuso3IUdmnMe", "delta": "停止", "response_id": "resp_EjlAFzXlHxesJhhPTxuMY", "output_index": 0, "t_ms": 2075}
+{"type": "response.output_text.delta", "item_id": "item_EjlAF7EhHPuso3IUdmnMe", "delta": "了", "response_id": "resp_EjlAFzXlHxesJhhPTxuMY", "output_index": 0, "t_ms": 2077}
+{"type": "response.output_text.delta", "item_id": "item_EjlAF7EhHPuso3IUdmnMe", "delta": "。", "response_id": "resp_EjlAFzXlHxesJhhPTxuMY", "output_index": 0, "t_ms": 2079}
+{"type": "response.output_text.delta", "item_id": "item_EjlAF7EhHPuso3IUdmnMe", "delta": "需要", "response_id": "resp_EjlAFzXlHxesJhhPTxuMY", "output_index": 0, "t_ms": 2108}
+{"type": "response.output_text.delta", "item_id": "item_EjlAF7EhHPuso3IUdmnMe", "delta": "继续", "response_id": "resp_EjlAFzXlHxesJhhPTxuMY", "output_index": 0, "t_ms": 2117}
+{"type": "response.output_text.delta", "item_id": "item_EjlAF7EhHPuso3IUdmnMe", "delta": "其他", "response_id": "resp_EjlAFzXlHxesJhhPTxuMY", "output_index": 0, "t_ms": 2121}
+{"type": "response.output_text.delta", "item_id": "item_EjlAF7EhHPuso3IUdmnMe", "delta": "操作", "response_id": "resp_EjlAFzXlHxesJhhPTxuMY", "output_index": 0, "t_ms": 2122}
+{"type": "response.output_text.delta", "item_id": "item_EjlAF7EhHPuso3IUdmnMe", "delta": "吗", "response_id": "resp_EjlAFzXlHxesJhhPTxuMY", "output_index": 0, "t_ms": 2129}
+{"type": "response.output_text.delta", "item_id": "item_EjlAF7EhHPuso3IUdmnMe", "delta": "？", "response_id": "resp_EjlAFzXlHxesJhhPTxuMY", "output_index": 0, "t_ms": 2134}
+{"type": "response.output_text.done", "item_id": "item_EjlAF7EhHPuso3IUdmnMe", "response_id": "resp_EjlAFzXlHxesJhhPTxuMY", "output_index": 0, "t_ms": 2149}
+{"type": "response.content_part.done", "item_id": "item_EjlAF7EhHPuso3IUdmnMe", "response_id": "resp_EjlAFzXlHxesJhhPTxuMY", "output_index": 0, "t_ms": 2149}
+{"type": "conversation.item.done", "t_ms": 2151}
+{"type": "response.output_item.done", "response_id": "resp_EjlAFzXlHxesJhhPTxuMY", "output_index": 0, "t_ms": 2153}
+{"type": "response.done", "response": {"id": "resp_EjlAFzXlHxesJhhPTxuMY", "status": "completed", "output": [{"type": "message", "text": "好的，我已经停止了。需要继续其他操作吗？"}], "usage": {"input_token_details": {"audio_tokens": 24, "cached_tokens": 832, "cached_tokens_details": {"audio_tokens": 0, "image_tokens": 0, "text_tokens": 832}, "image_tokens": 0, "text_tokens": 847}, "input_tokens": 871, "output_token_details": {"audio_tokens": 0, "text_tokens": 14}, "output_tokens": 14, "total_tokens": 885}}, "t_ms": 2162}

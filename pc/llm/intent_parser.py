@@ -1,8 +1,42 @@
 import json
-import re
+
+
+def parse_line(line: str) -> list[dict]:
+    """
+    解析 LLM 流式输出的一行 (NDJSON): {"action": "...", "args": {...}}。
+    也兼容一行里是旧格式 {"steps": [...]} 的情况。
+    动作名不认识的行原样返回 (由 RobotAgent 拒绝并记录原因), 不是 JSON 的行返回空列表。
+    """
+    s = (line or "").strip().rstrip(",")
+    if not s.startswith("{"):
+        return []
+    try:
+        obj = json.loads(s)
+    except ValueError:
+        return []
+    if not isinstance(obj, dict):
+        return []
+
+    steps = obj.get("steps")
+    if isinstance(steps, list):
+        return [n for n in (_normalize_step(step) for step in steps) if n]
+
+    normalized = _normalize_step(obj)
+    if normalized:
+        return [normalized]
+    action = obj.get("action")
+    if isinstance(action, str) and action.strip():
+        args = obj.get("args")
+        return [{"action": action.strip(), "args": args if isinstance(args, dict) else {}}]
+    return []
 
 
 def parse_intent(llm_text: str) -> dict:
+    """
+    解析 LLM 的完整输出。支持两种格式:
+    - 每行一个动作 (NDJSON, 现在的输出规范)
+    - 旧格式: 一个 {"steps": [...]} 对象
+    """
     try:
         obj = json.loads(_extract_json_text(llm_text))
         if isinstance(obj, dict):
@@ -28,10 +62,24 @@ def parse_intent(llm_text: str) -> dict:
     except Exception:
         pass
 
-    # fallback: compatible with non-JSON output, split by connectors
-    text = (llm_text or "").strip().lower()
-    steps = _fallback_steps_from_text(text)
-    return {"steps": steps}
+    # 每行一个动作 (NDJSON)
+    text = _strip_code_fence(llm_text)
+    line_steps: list[dict] = []
+    for line in text.splitlines():
+        line_steps.extend(parse_line(line))
+
+    # 不是合法 JSON 时不再按关键词猜动作, 返回空结果 (由调用方提示无法识别)
+    return {"steps": line_steps}
+
+
+def _strip_code_fence(raw: str) -> str:
+    s = (raw or "").strip()
+    if s.startswith("```"):
+        lines = s.strip("`").splitlines()
+        if lines and lines[0].lower().strip() in ("json", "jsonl", "ndjson", "javascript"):
+            lines = lines[1:]
+        s = "\n".join(lines)
+    return s
 
 
 def _normalize_step(obj: dict) -> dict | None:
@@ -48,12 +96,11 @@ def _normalize_step(obj: dict) -> dict | None:
     else:
         payload = {}
 
-    if action in ("forward", "backward", "straightforward", "straightbackward",
-                  "line_follow_left", "line_follow_right",):
+    if action in ("forward", "backward", "line_follow_left", "line_follow_right",):
         distance = _to_int_or_none(payload.get("distance_cm"))
         return {"action": action, "args": {"distance_cm": distance}}
 
-    if action in ("left", "right", "face_to", "gripper_pos",
+    if action in ("left", "right", "gripper_pos",
                   "gripper_left_pos", "gripper_right_pos",):
         angle = _to_int_or_none(payload.get("angle_deg"))
         return {"action": action, "args": {"angle_deg": angle}}
@@ -110,87 +157,6 @@ def _to_str_or_none(value: object) -> str | None:
         return None
 
 
-def _fallback_steps_from_text(text: str) -> list[dict]:
-    if not text:
-        return []
-
-    # Split by connectors like "then", comma, semicolon, etc.
-    clauses = re.split(r"\s*(?:然后|之后|再|and then|then|,|，|;|；)\s*", text)
-    clauses = [c.strip() for c in clauses if c and c.strip()]
-
-    steps: list[dict] = []
-    for clause in clauses:
-        action: str | None = None
-        if any(k in clause for k in ("停", "停止", "stop")):
-            action = "stop"
-        elif any(k in clause for k in ("前", "forward", "ahead")):
-            action = "forward"
-        elif any(k in clause for k in ("后", "后退", "backward")):
-            action = "backward"
-        elif any(k in clause for k in ("line_follow_left", "line follow left", "左侧巡线")):
-            action = "line_follow_left"
-        elif any(k in clause for k in ("line_follow_right", "line follow right", "右侧巡线")):
-            action = "line_follow_right"
-        elif any(k in clause for k in ("gripper_left_up", "left gripper up", "左夹爪抬起")):
-            action = "gripper_left_up"
-        elif any(k in clause for k in ("gripper_left_down", "left gripper down", "左夹爪放下")):
-            action = "gripper_left_down"
-        elif any(k in clause for k in ("gripper_right_up", "right gripper up", "右夹爪抬起")):
-            action = "gripper_right_up"
-        elif any(k in clause for k in ("gripper_right_down", "right gripper down", "右夹爪放下")):
-            action = "gripper_right_down"
-
-        elif any(k in clause for k in ("gripper_up", "gripper up")):
-            action = "gripper_up"
-        elif any(k in clause for k in ("gripper_down", "gripper down")):
-            action = "gripper_down"
-        elif any(k in clause for k in ("gripper_pos", "gripper pos")):
-            action = "gripper_pos"
-        elif any(k in clause for k in (
-            "gripper_left_pos", "left gripper pos", "左夹爪转到"
-        )):
-            action = "gripper_left_pos"
-        elif any(k in clause for k in (
-            "gripper_right_pos", "right gripper pos", "右夹爪转到"
-        )):
-            action = "gripper_right_pos"
-        elif any(k in clause for k in ("左", "left")):
-            action = "left"
-        elif any(k in clause for k in ("右", "right")):
-            action = "right"
-
-        if not action:
-            continue
-
-        p = _extract_params(clause)
-        if action in ("forward", "backward", "line_follow_left", "line_follow_right",):
-            step = {"action": action, "args": {"distance_cm": p.get("distance_cm")}}
-        elif action in ("left", "right", "gripper_pos",
-                        "gripper_left_pos", "gripper_right_pos",):
-            angle = p.get("angle_deg")
-            if angle is None:
-                # 裸数字由 _extract_params 暂存为 distance_cm
-                angle = p.get("distance_cm")
-
-            step = {"action": action, "args": {"angle_deg": angle}}
-        elif action in (
-            "stop",
-            "gripper_up",
-            "gripper_down",
-            "gripper_left_up",
-            "gripper_left_down",
-            "gripper_right_up",
-            "gripper_right_down",
-        ):
-            step = {"action": action, "args": {}}
-        else:
-            step = {"action": "stop", "args": {}}
-
-        steps.append(step)
-
-    return steps
-
-
 def _normalize_action(action: str) -> str | None:
     value = action.strip().lower()
 
@@ -205,8 +171,9 @@ def _normalize_action(action: str) -> str | None:
         "b": "backward",
         "back": "backward",
 
-        "straightforward": "straightforward",
-        "straightbackward": "straightbackward",
+        # 旧动作名 (已从技能中删除), 作为别名保留
+        "straightforward": "forward",
+        "straightbackward": "backward",
 
         # 转向
         "left": "left",
@@ -218,10 +185,6 @@ def _normalize_action(action: str) -> str | None:
         "r": "right",
         "right turn": "right",
         "turn_right": "right",
-
-        "face_to": "face_to",
-        "face": "face_to",
-        "look at": "face_to",
 
         # 停止
         "stop": "stop",
@@ -298,25 +261,6 @@ def _normalize_action(action: str) -> str | None:
         return aliases[value]
 
     return None
-
-
-def _extract_params(text: str) -> dict:
-    params: dict = {}
-    match = re.search(r"(\d+(\.\d+)?)\s*(cm|m|米|deg|°|度)?", text)
-    if not match:
-        return params
-
-    value = float(match.group(1))
-    unit = (match.group(3) or "").lower()
-    if unit == "cm":
-        params["distance_cm"] = int(value)
-    elif unit in ("m", "米"):
-        params["distance_cm"] = int(value * 100)
-    elif unit in ("deg", "度", "°"):
-        params["angle_deg"] = int(value)
-    else:
-        params["distance_cm"] = int(value)
-    return params
 
 
 def _extract_json_text(raw: str) -> str:

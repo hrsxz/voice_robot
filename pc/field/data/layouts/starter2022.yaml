@@ -1,0 +1,25 @@
+# 布局: 物体放在哪里。按 docs/WRO/WRO2022-ST-Aufgaben.pdf (Starter 2022) 第 4–6 页摆放。
+# 每个物体引用 wro_field.yaml 里的命名位置点, 或者直接写坐标 [x, y] (厘米), 物体可以随意摆。
+# 没有出现在布局里的目录物体 = 这一局不在场上。
+name: starter2022
+
+objects:
+  yellow_person: a_side     # A 区右边
+  green_person: b_side      # B 区下方
+  blue_person: c_inner      # C 区里
+  red_person: d_left        # D 区左边
+  package_1: pos2           # 左边 2、3 号位
+  package_2: pos3
+  green_robot: d1           # D 区上方 6 格里的 4 格 (第 2、5 格是树)
+  red_robot: d3
+  blue_robot: d4
+  yellow_robot: d6
+
+# 树和障碍杆: 不能碰 (碰到就扣掉奖励分)。模拟器里它们是会被碰倒的物体;
+# 规划时对应 wro_field.yaml 里的禁行区。
+obstacles:
+  tree_1: {type: tree, at: pos1, radius_cm: 3.5}
+  tree_2: {type: tree, at: pos4, radius_cm: 3.5}
+  tree_3: {type: tree, at: d2, radius_cm: 3.5}
+  tree_4: {type: tree, at: d5, radius_cm: 3.5}
+  barrier: {type: barrier, polygon: [[42.2, 31.6], [44.8, 31.6], [44.8, 64.4], [42.2, 64.4]]}

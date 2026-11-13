@@ -4,3 +4,18 @@
 /pc/llm/__pycache__/*.pyc
 /pc/speech/__pycache__/*.pyc
 /pc/spike_communication/__pycache__/*.pyc
+
+# 合成的测试录音（由 scripts/make_test_audio.py 生成）
+tests/fixtures/audio/**/*.wav
+
+# 耗时日志、回放日志（含识别出的文字，不提交）
+logs/
+
+# Python 缓存
+__pycache__/
+
+# WRO 任务书 PDF（版权属于 WRO，文件大；只在本地使用）
+docs/WRO/*.pdf
+
+# 本机的相机标定结果和参考图（和摄像头、三脚架位置有关）
+pc/config/local/

@@ -72,7 +72,7 @@ class RobotAgentTest(unittest.IsolatedAsyncioTestCase):
 
 if __name__ == "__main__":
     """
-        python -m unittest tests.test_robot_agent                          
+        python -m unittest tests.test_robot_agent
         ...Skipped command: left 999, reason: value above max
         ..
         ----------------------------------------------------------------------

@@ -39,6 +39,7 @@ output_schema:
 action_rules:
   sensor:
     route: sensor
+    description: "读取传感器：distance 距离、color 颜色、gyro 陀螺仪"
     value_type: str
     arg_key: name
     allowed:

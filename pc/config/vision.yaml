@@ -1,0 +1,54 @@
+# 感知参数 (改动 vision-field-model)。换摄像头、换小车只改这里, 不改代码。
+# 带 "估计值" 的项等摄像头和小车实测后再改 (docs/roadmap.md "需要你提供的资料")。
+
+camera:
+  index: 0
+  width: 1920
+  height: 1080
+  fourcc: MJPG          # 1080p 下保证帧率
+  backend: dshow        # Windows: DirectShow; 其他系统写 auto
+  lock:                 # 尝试关闭自动对焦 / 自动曝光 / 自动白平衡 (摄像头不支持时启动时警告)
+    autofocus: false
+    auto_exposure: false
+    auto_white_balance: false
+  focus: null           # 手动对焦值 (null = 不设置, 摄像头到货后试出来再填)
+  exposure: null        # 手动曝光值 (DirectShow 常用 -4 ~ -7)
+
+# 本机的标定结果和参考图 (和摄像头、三脚架位置有关, 不提交到 git)
+local_dir: pc/config/local
+intrinsics_file: camera_intrinsics.yaml
+reference_file: reference_topview.png
+
+aruco:
+  dictionary: DICT_4X4_50
+
+anchors:               # 场外 4 个 anchor: 中心位置在 pc/field/data/wro_field.yaml 的 anchors 里
+  size_cm: 8.0         # 黑色方块的边长 (不含白边)
+  rotation_deg: 0      # 0 = marker 的"上边"朝场地上方 (-y); 顺时针为正
+  recheck_s: 5.0       # 运行中每隔多久复查一次
+  drift_cm: 1.0        # anchor 偏差超过多少就重新计算相机位姿
+
+robot_marker:
+  id: 20
+  size_cm: 9.0         # 估计值
+  height_cm: 10.0      # marker 离地高度, 估计值
+  offset_cm: [0.0, 0.0]  # marker 中心在车身坐标系里的位置 (前, 右), 相对转弯中心; 估计值
+  rotation_deg: 0      # 0 = marker 的"上边"朝车头
+
+topview:
+  px_per_cm: 4         # 矫正俯视图的分辨率 (约 945 × 457 像素)
+  margin_cm: 0
+
+lighting:
+  max_change: 0.25     # 静态区域平均亮度和参考图相差超过 25% 就警告
+
+detection:
+  diff_threshold: 22   # Lab 色差阈值
+  min_area_cm2: 8      # 候选区域面积范围 (俯视图里, 含高度造成的"拉长")
+  max_area_cm2: 400
+  min_saturation: 70   # 判断颜色时只看饱和度够高的像素
+  robot_margin_cm: 3   # 去掉小车区域时多去掉一圈
+
+tracking:
+  start_gate_cm: 12    # 开局: 检测结果离起始位置多远以内才能配对
+  track_gate_cm: 30    # 运行中: 每次更新物体最多移动多远

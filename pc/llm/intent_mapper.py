@@ -10,15 +10,17 @@
 动作来源与支持范围:
 - 动作规则动态来自 skills 目录各 *.skill.md 的 action_rules（经 load_skill_registry 加载并缓存）。
 - 常见动作包括:
-  - 移动/转向/夹爪: stop, forward, backward, straightforward, straightbackward,
-    left, right, face_to, gripper_up, gripper_down, gripper_pos
+  - 移动/转向/夹爪: stop, forward, backward, left, right,
+    gripper_up, gripper_down, gripper_pos 等 (以 skills/move.skill.md 为准)
   - 工具: camera(mode=photo|video), sensor(name=distance|color|gyro)
 - 若 action 不在规则表中，保留原 action 作为命令输出。
 
 映射规则:
 - value_type == "none": 输出 "action"
-- value_type == "int": 读取 rule.arg_key 对应参数，可转为整数则输出 "action <int>"，否则仅输出 "action"
-- value_type == "str": 读取 rule.arg_key 对应参数，若不在 allowed 中则回退到 allowed 的第一个值；最终输出 "action <str>"；
+- value_type == "int": 读取 rule.arg_key 对应参数，可转为整数则输出 "action <int>"，
+  否则仅输出 "action"
+- value_type == "str": 读取 rule.arg_key 对应参数，若不在 allowed 中则回退到 allowed 的
+  第一个值；最终输出 "action <str>"；
   若无法确定字符串参数则仅输出 "action"
 
 输出契约:
@@ -75,6 +77,13 @@ def _step_to_cmd(step: dict) -> str | None:
 
     # 兜底：直接把 action 当命令
     return action
+
+
+def step_to_cmd(step: dict) -> str | None:
+    """把一个 step ({"action", "args"}) 映射成命令字符串, 流式执行时逐条使用。"""
+    if not isinstance(step, dict):
+        return None
+    return _step_to_cmd(step)
 
 
 def intent_to_sequence(intent: dict) -> dict:

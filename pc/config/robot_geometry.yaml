@@ -1,0 +1,10 @@
+# 小车尺寸 (厘米), 车身坐标系原点在转弯中心 (两个驱动轮中点), x 向车头。
+# 现在都是估计值; 量好真实小车后改这里 (pc/field/robot_geometry.py 有每一项的说明)。
+body_front: 9.0         # 转弯中心到车头 (不含夹爪)
+body_rear: 8.0          # 转弯中心到车尾
+half_width: 7.5         # 车身半宽 (底部横线离 D 区方格只有约 8 cm)
+cage_offset: 15.0       # 转弯中心到笼区中心
+cage_inner_depth: 11.0  # 笼区内深
+cage_inner_width: 13.0  # 笼区内宽 (蓝色大人能放进去)
+cage_wall: 1.0          # 夹爪厚度
+raised_front: 10.0      # 夹爪抬起 (竖着) 时, 车最前端到转弯中心的距离
