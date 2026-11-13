@@ -146,7 +146,7 @@
 
 - [ ] **把新版 Hub 程序下载到 Hub**（README 第 12 节）：所有实车实验的前提。
 - [ ] 按 [experiments.md](experiments.md) 做实车实验（建议顺序写在那里），把日志和观察结果交给 Claude。
-- [x] 提交代码（2026-11-13，分支 `dev/openspec-changes`，还没有推送；之后的改动按需要再提交）
+- [x] 提交代码（2026-11-13，分支 `dev/openspec-changes`，已推送到 GitHub；还没有合并到 main）
 
 ### 需要你提供的资料（视觉线用）
 
