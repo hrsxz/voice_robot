@@ -64,13 +64,15 @@ class FieldDataTest(unittest.TestCase):
                     "d1", "d2", "d3", "d4", "d5", "d6"]:
             self.assertIn(pid, self.field.positions)
 
-    def test_calibrator_reads_anchors_from_field_file(self):
-        try:
-            from pc.vision.calibration import MapCalibrator
-        except ImportError as exc:  # opencv 不可用时跳过
-            self.skipTest(str(exc))
-        anchors = MapCalibrator._load_anchors(DEFAULT_FIELD)
+    def test_vision_reads_anchors_from_field_file(self):
+        from pc.vision.extrinsics import anchor_specs
+
+        anchors = anchor_specs(self.field)
         self.assertEqual(sorted(anchors), [10, 11, 12, 13])
+        # anchor 贴在场地垫外面
+        for a in anchors.values():
+            self.assertFalse(0 < a.center[0] < self.field.width and
+                             0 < a.center[1] < self.field.height, a)
 
 
 class FieldValidationTest(unittest.TestCase):

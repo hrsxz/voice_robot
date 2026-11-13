@@ -278,6 +278,25 @@ python -m scripts.sim_task --measure --runs 3           # 测量（见 openspec/
 - 任务代理的模型用 `--task-model` 选（默认 `gpt-5.5`），和意图解析的小模型分开。
 - 现在**只在模拟器里**：`--hub ble` 时目标级请求不会让真实小车移动（要等摄像头）。
 
+### 15) 摄像头感知：标定、定位、物体检测（代码已完成，等摄像头）
+
+三脚架摄像头斜拍场地：4 个场外 anchor 算出相机位姿，车顶 marker 给出小车位置和朝向，和空场地参考图做差分找出物体。参数都在 `pc/config/vision.yaml`（摄像头、marker 编号 / 尺寸 / 离地高度、检测阈值），本机的标定结果和参考图在 `pc/config/local/`（不提交）。
+
+**摄像头到货后按顺序做一次：**
+
+1. **打印 marker**：`python -m pc.vision.generate_aruco_marker`，输出到 `aruco_markers/`。anchor（10–13）黑色方块打印成 8 cm，车顶 marker（20）打印成 9 cm，四周留白边。
+2. **贴 anchor**：贴在场地垫四个角**外面**的桌面上，marker 的"上边"朝场地上方（A、B 区那一侧）。量出每个 anchor 中心的场地坐标（原点在场地垫左上角，x 向右、y 向下，单位厘米），改 `pc/field/data/wro_field.yaml` 的 `anchors`。
+3. **车顶 marker**：贴在车顶，"上边"朝车头。量 marker 离地高度、marker 中心相对转弯中心的偏移（前、右），改 `vision.yaml` 的 `robot_marker`。
+4. **标定镜头**：打印 9×6 内角点、格子 25 mm 的棋盘格（贴在硬纸板上），运行 `python -m pc.vision.calibrate`。对着摄像头拿着棋盘格，变换位置和倾斜角度，**画面四角都要拍到**，按空格拍 15–20 张，按 `c` 计算。重投影误差超过 1 像素时不保存，按提示重拍。换了分辨率要重新标定。
+5. **架好三脚架**，四个 anchor 都在画面里。场地清空（没有小车和物体），拍参考图：`python -m pc.vision.vision_demo --camera --capture-reference`。
+6. **核对场地坐标**：`python -m pc.vision.field_check`，列出参考图里和 `wro_field.yaml` 相差超过 2 cm 的区域边和圆圈。
+7. **调试画面**：`python -m pc.vision.vision_demo --camera --show`。白线是场地边界，彩色线是区域和圆圈（应该和场地垫重合），紫框是 anchor，绿箭头是小车朝向，黄十字是笼区中心，物体旁边是编号（橙色 = 被遮挡）。按 q 退出。
+
+- **相机位姿**：启动时需要 4 个 anchor 都在画面里，缺了会报告缺哪个，不输出任何场地坐标；运行中每 5 秒复查，三脚架被碰（anchor 偏差超过 1 cm）会自动重新计算并警告。
+- **小车定位**：视线和"marker 高度"平面求交（修正斜拍造成的视差），输出转弯中心、朝向和笼区中心；看不到 marker 时报告"不可见"和最后的位姿，不会把旧位姿当成当前位置。
+- **物体**：差分检测 + 颜色判断，按物体高度修正视差；开局按布局（`--layout`）的起始位置确定身份，报告缺少和多出的物体；之后持续跟踪，被挡住时保留最后位置，被夹住时跟着笼区中心走。光照和参考图相差超过 25% 时警告。
+- **没有摄像头也能试**：测试用 `pc/vision/synthetic.py` 合成摄像头画面（含镜头畸变和噪声），`python -m unittest tests.test_vision` 覆盖以上全部流程。
+
 ## 项目目标（To-Be）
 
 最终目标是把 RobotAgent 做成唯一执行中枢，输入层、NLU 层和工具层都围绕统一契约工作。
@@ -511,6 +530,7 @@ flowchart LR
 - `pc/world/state.py`：世界状态：小车位姿、物体状态（在起点 / 被移动 / 被夹住 / 已送达 / 被遮挡 / 丢失）、夹爪状态（只来自 Hub 回报），给任务层 LLM 的结构化摘要。
 - `pc/navigation/`：三个接口和真实系统的适配器（`ports.py`）、道路网规划（`planner.py`）、闭环 `go_to`（`controller.py`）、笼式抓取和放下（`grasp.py`）。
 - `pc/sim/`：运动学模拟器（`simulator.py`，实现同样的三个接口）、俯视图（`viewer.py`）、整局任务（`mission.py`）。
+- `pc/vision/`：摄像头感知：采集（`camera_stream.py`）、内参标定（`calibrate.py`）、相机模型（`camera_model.py`）、anchor 和相机位姿（`extrinsics.py`）、小车定位（`localizer.py`）、俯视图和参考图（`topview.py`）、物体检测（`objects.py`）、身份和跟踪（`tracker.py`）、场地核对（`field_check.py`）、调试画面（`debug_view.py`）、整体（`vision_system.py`）、合成画面（`synthetic.py`，测试用）。参数在 `pc/config/vision.yaml`。
 - `pc/task/`：任务层：任务组配置（`missions.py` + `data/missions.yaml`）、任务技能的工具定义和校验（`tools.py`，来自 `skills/task.skill.md`）、技能执行器（`skills.py`）、任务代理（`agent.py`，LLM 工具调用循环、上限、反问、失败策略、停止）、运行环境（`runtime.py`）。语音层用 `run_task` 交接：stream 链路是意图 LLM 输出的一行，realtime 链路是一个工具。
 
 ### 9) 开发工具
@@ -843,6 +863,8 @@ pc/
   world/                    # 世界状态
   navigation/               # 接口和适配器, 道路网规划, 闭环导航, 抓取和放下
   sim/                      # 运动学模拟器, 俯视图, 整局任务
+  vision/                   # 摄像头感知: 标定, 相机位姿, 小车定位, 物体检测和跟踪, 调试画面, 合成画面
+  config/vision.yaml        # 感知参数 (本机标定结果在 config/local/, 不提交)
   task/                     # 任务层: 任务组配置 (data/missions.yaml), 任务技能, 任务代理, 运行环境
   config/robot_geometry.yaml  # 小车尺寸 (估计值, 实测后修改)
 spike_hub/

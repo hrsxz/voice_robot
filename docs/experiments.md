@@ -393,6 +393,48 @@ python -m pc.voice_to_robot --hub ble --input wake --pipeline realtime --latency
 
 ---
 
+## 改动 6：vision-field-model（摄像头感知）
+
+对应任务：`openspec/changes/vision-field-model/tasks.md` 的 1.2、4.3、6.2。代码已完成并用合成画面测试过（`openspec/changes/vision-field-model/measurements.md`），这里是摄像头到货后的实测。**先按 README 第 15 节第 1–5 步做好准备**（打印并贴好 marker、量 anchor 位置、标定、拍参考图）。
+
+### 实验 6-1：摄像头参数和标定（任务 1.2）
+
+```bash
+python -m pc.vision.vision_demo --camera --show
+```
+
+- [ ] 启动时有没有打印"警告：……"（例如"无法锁定对焦，标定可能失效"）？把警告原文记下来
+- [ ] 调试画面里，彩色线和场地垫上的区域、圆圈重合（偏差大概多少？）
+- [ ] 标定时终端显示的重投影误差：____ 像素
+- [ ] `python -m pc.vision.field_check` 的输出（有没有超过 2 cm 的地方）
+
+### 实验 6-2：小车定位精度（任务 4.3）
+
+把小车摆在至少 5 个已知位置（用卷尺量转弯中心的坐标和车头朝向；**包括离相机最远的两个角落**），每个位置在调试画面里读出 `robot (x, y) 朝向`，填表：
+
+| 位置 | 实际 x, y, 朝向 | 测出 x, y, 朝向 |
+|---|---|---|
+| 1 |  |  |
+
+- [ ] 位置误差都不超过 2 cm、朝向误差不超过 3°
+- [ ] 原地转一圈（手转），终端里转弯中心的坐标变化不超过 1 cm
+- [ ] 用手挡住车顶 marker 2 秒：调试画面显示 `robot NOT VISIBLE (last seen …)`
+
+### 实验 6-3：物体检测和跟踪（任务 6.2）
+
+```bash
+python -m pc.vision.vision_demo --camera --show --layout starter2022
+```
+
+- [ ] 按 Starter 2022 摆好全部物体后启动：终端显示"认出 10 个物体"；少放一个包裹时显示"缺少 package_2"
+- [ ] 用手把黄色小人移动约 20 cm：调试画面里编号跟着走，量一下位置误差（≤ 2 cm）
+- [ ] 小车挡住某个物体时，它的编号变成橙色（被遮挡），小车离开后恢复
+- [ ] 关掉一半的灯：终端警告"光照和参考图差别过大"
+
+**交给 Claude**：终端输出、调试画面截图（`--save logs/debug.png`）、上面的表格
+
+---
+
 ## 改动 7：navigation-grasp（导航 + 抓取）
 
 对应任务：`openspec/changes/navigation-grasp/tasks.md` 的 6.2。模拟器部分已经完成（结果见 `openspec/changes/navigation-grasp/measurements.md`）；实车实验要等摄像头到货、改动 6 的定位和物体检测做完之后才能做。

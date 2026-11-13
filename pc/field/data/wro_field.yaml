@@ -14,12 +14,13 @@ field:
   width_cm: 236.2
   height_cm: 114.3
 
-# 场外 ArUco anchor 的中心 (MapCalibrator 读这一节)。实际位置等摄像头到货、贴好 marker 后再量。
+# 场外 ArUco anchor 的中心 (pc/vision/extrinsics.py 读这一节): 贴在场地垫四个角外面的桌面上,
+# marker 边长、朝向在 pc/config/vision.yaml。现在是计划的位置, 贴好后量实际位置再改。
 anchors:
-  10: {x_cm: 4, y_cm: 4}
-  11: {x_cm: 233, y_cm: 4}
-  12: {x_cm: 233, y_cm: 111}
-  13: {x_cm: 4, y_cm: 111}
+  10: {x_cm: -7, y_cm: -7}
+  11: {x_cm: 243.2, y_cm: -7}
+  12: {x_cm: 243.2, y_cm: 121.3}
+  13: {x_cm: -7, y_cm: 121.3}
 
 # 区域: 多边形 (不含黑色边框)。entries = 进入点: 小车 (转弯中心) 在这里、朝向 heading 时,
 # 正前方就是这个区域, 放下物体时从进入点沿 heading 方向直线前进。

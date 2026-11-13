@@ -61,6 +61,13 @@ marker 的 4 个角点像素 → 去畸变 → 从相机中心出发的视线 �
 ### D11 修复和整理现有代码
 统一模块名（`data_types`、`target_detector`、`robot_pose_tracker` 等），修复导入错误；`RedBlockDetector` 被差分检测取代，`MapCalibrator` 的单应矩阵逻辑并入 D7 的矫正俯视图。
 
+实现时的调整（2026-11-13）：
+- 旧模块（`calibration.py` 的 `MapCalibrator`、`robot_pose_tracker.py`、`target_detector.py`、`data_types.py`）直接删除，由新模块取代：`camera_model`、`extrinsics`、`localizer`、`topview`、`objects`、`tracker`、`field_check`、`debug_view`、`vision_system`。参数集中在 `pc/config/vision.yaml`，本机的标定结果和参考图放在 `pc/config/local/`（不提交）。
+- anchor 的计划位置改到场地垫四角外面（各向外 7 cm），符合 D4"贴在场地垫外的桌面上"；贴好后按实测改。
+- 物体检测加了双阈值：和强差异区域相连的弱差异像素也算。没有它时，蓝色大人站在蓝色 C 区里只检测出一部分，位置偏 2.7 cm；加了以后 0.35 cm。
+- 光照检查排除的是小车和已检测物体附近的区域（不是全部差分像素：光照变化很大时几乎所有像素都"不同"，会把比较区域排除光）。
+- 为了在没有摄像头时测试，新增合成画面渲染（`synthetic.py`）：按已知的内参（含畸变）和相机位姿渲染场地垫、anchor、小车（车身 + 车顶 marker）、物体（圆柱）和棋盘格。
+
 ## Risks / Trade-offs
 
 - [摄像头不能关闭自动对焦，内参会漂移] → 启动时警告；采购时选择能手动对焦的摄像头。

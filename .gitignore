@@ -16,3 +16,6 @@ __pycache__/
 
 # WRO 任务书 PDF（版权属于 WRO，文件大；只在本地使用）
 docs/WRO/*.pdf
+
+# 本机的相机标定结果和参考图（和摄像头、三脚架位置有关）
+pc/config/local/
